@@ -10,11 +10,11 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-              TechPyme
+              TechStore
             </h3>
             <p className="text-gray-300 mb-4">
-              Soluciones tecnológicas especializadas para pequeñas y medianas empresas. 
-              Impulsamos tu crecimiento con la mejor tecnología.
+              Tu tienda de tecnología de confianza. Los mejores productos, 
+              precios competitivos y servicio al cliente excepcional.
             </p>
             <div className="flex space-x-4">
               <Facebook className="h-5 w-5 text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
@@ -28,23 +28,23 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Productos</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Hardware</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Software</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Networking</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Seguridad</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Servidores</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Smartphones</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Laptops</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Audio</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Gaming</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Fotografía</a></li>
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Support */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Servicios</h4>
+            <h4 className="text-lg font-semibold mb-4">Soporte</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Consultoría Técnica</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Instalación</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Soporte Técnico</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Mantenimiento</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Capacitación</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Centro de Ayuda</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Envíos y Devoluciones</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Garantías</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Mi Cuenta</a></li>
             </ul>
           </div>
 
@@ -58,7 +58,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">ventas@techpyme.com</span>
+                <span className="text-gray-300">soporte@techstore.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-blue-400" />
@@ -70,7 +70,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 TechPyme. Todos los derechos reservados.
+            © 2024 TechStore. Todos los derechos reservados.
           </p>
         </div>
       </div>

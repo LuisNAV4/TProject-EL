@@ -12,11 +12,12 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const categories = [
-    'Hardware',
-    'Software',
-    'Servicios',
-    'Accesorios',
-    'Networking'
+    'Smartphones',
+    'Laptops',
+    'Audio',
+    'Gaming',
+    'Fotografía',
+    'Wearables'
   ];
 
   return (
@@ -26,7 +27,7 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              TechPyme
+              TechStore
             </h1>
           </div>
 
@@ -35,7 +36,7 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
             <div className="relative w-full">
               <input
                 type="text"
-                placeholder="Buscar productos tecnológicos..."
+                placeholder="Buscar smartphones, laptops, accesorios..."
                 className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -46,7 +47,7 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="sm" className="hidden md:flex">
               <User className="h-5 w-5 mr-2" />
-              Cuenta
+              Mi Cuenta
             </Button>
             <Button
               variant="ghost"

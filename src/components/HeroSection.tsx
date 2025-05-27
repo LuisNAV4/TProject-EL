@@ -13,21 +13,21 @@ const HeroSection = () => {
             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
               Tecnología de
               <span className="block bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Vanguardia
+                Última Generación
               </span>
-              para tu PyME
+              a tu alcance
             </h1>
             <p className="text-xl mb-8 text-gray-200 leading-relaxed">
-              Descubre las mejores soluciones tecnológicas diseñadas específicamente 
-              para potenciar el crecimiento de tu pequeña y mediana empresa.
+              Descubre los mejores productos tecnológicos, desde laptops y smartphones 
+              hasta gadgets innovadores. Calidad garantizada y precios competitivos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold">
-                Explorar Catálogo
+                Ver Productos
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-900">
-                Consultar Experto
+                Ofertas del Día
               </Button>
             </div>
           </div>
@@ -35,8 +35,8 @@ const HeroSection = () => {
           <div className="lg:w-1/2 relative">
             <div className="relative z-10">
               <img
-                src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                alt="Tecnología empresarial"
+                src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                alt="Productos tecnológicos"
                 className="rounded-lg shadow-2xl"
               />
             </div>
@@ -49,11 +49,11 @@ const HeroSection = () => {
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex items-center space-x-4">
             <div className="bg-white bg-opacity-20 p-3 rounded-full">
-              <Zap className="h-6 w-6" />
+              <Truck className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-semibold">Instalación Rápida</h3>
-              <p className="text-gray-300">Configuración en menos de 24 horas</p>
+              <h3 className="font-semibold">Envío Gratis</h3>
+              <p className="text-gray-300">En compras superiores a $999</p>
             </div>
           </div>
           
@@ -63,17 +63,17 @@ const HeroSection = () => {
             </div>
             <div>
               <h3 className="font-semibold">Garantía Extendida</h3>
-              <p className="text-gray-300">Soporte técnico especializado</p>
+              <p className="text-gray-300">Hasta 2 años en productos seleccionados</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-4">
             <div className="bg-white bg-opacity-20 p-3 rounded-full">
-              <Truck className="h-6 w-6" />
+              <Zap className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-semibold">Envío Gratuito</h3>
-              <p className="text-gray-300">En compras superiores a $50,000</p>
+              <h3 className="font-semibold">Entrega Rápida</h3>
+              <p className="text-gray-300">Recibe tu pedido en 24-48 horas</p>
             </div>
           </div>
         </div>

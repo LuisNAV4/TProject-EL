@@ -1,43 +1,43 @@
 
 import React from 'react';
-import { Monitor, Server, Wifi, Headphones, Shield, Code } from 'lucide-react';
+import { Smartphone, Laptop, Headphones, Camera, Watch, Gamepad2 } from 'lucide-react';
 
 const CategorySection = () => {
   const categories = [
     {
-      icon: Monitor,
-      title: 'Hardware',
-      description: 'Computadoras, laptops y componentes',
+      icon: Smartphone,
+      title: 'Smartphones',
+      description: 'Los últimos modelos de iPhone, Samsung y más',
       color: 'from-blue-500 to-cyan-500'
     },
     {
-      icon: Code,
-      title: 'Software',
-      description: 'Licencias y aplicaciones empresariales',
+      icon: Laptop,
+      title: 'Laptops',
+      description: 'Computadoras portátiles para trabajo y gaming',
       color: 'from-purple-500 to-pink-500'
     },
     {
-      icon: Wifi,
-      title: 'Networking',
-      description: 'Routers, switches y soluciones de red',
+      icon: Headphones,
+      title: 'Audio',
+      description: 'Audífonos, bocinas y equipos de sonido',
       color: 'from-green-500 to-teal-500'
     },
     {
-      icon: Shield,
-      title: 'Seguridad',
-      description: 'Antivirus, firewalls y protección',
+      icon: Camera,
+      title: 'Fotografía',
+      description: 'Cámaras digitales y accesorios',
       color: 'from-red-500 to-orange-500'
     },
     {
-      icon: Server,
-      title: 'Servidores',
-      description: 'Infraestructura y almacenamiento',
+      icon: Watch,
+      title: 'Wearables',
+      description: 'Smartwatches y dispositivos inteligentes',
       color: 'from-indigo-500 to-blue-500'
     },
     {
-      icon: Headphones,
-      title: 'Accesorios',
-      description: 'Periféricos y complementos',
+      icon: Gamepad2,
+      title: 'Gaming',
+      description: 'Consolas, videojuegos y accesorios',
       color: 'from-yellow-500 to-orange-500'
     }
   ];
@@ -47,10 +47,10 @@ const CategorySection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Categorías Principales
+            Categorías Populares
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Encuentra exactamente lo que necesitas para impulsar tu negocio con nuestras categorías especializadas
+            Explora nuestra amplia selección de productos tecnológicos organizados por categorías
           </p>
         </div>
         
