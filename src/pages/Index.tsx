@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import HeroSection from '../components/HeroSection';
 import CategorySection from '../components/CategorySection';
-import ServicesSection from '../components/ServicesSection';
 import ProductGrid from '../components/ProductGrid';
 import Cart from '../components/Cart';
 import Footer from '../components/Footer';
@@ -63,21 +62,19 @@ const Index = () => {
       
       <HeroSection />
       
-      <ServicesSection />
-      
       <CategorySection />
       
       <ProductGrid
         products={featuredProducts}
         onAddToCart={handleAddToCart}
-        title="Productos Tecnológicos Destacados"
+        title="Productos Destacados"
       />
       
       <div className="bg-gray-50">
         <ProductGrid
           products={sampleProducts.slice(4)}
           onAddToCart={handleAddToCart}
-          title="Más Productos para tu PyME"
+          title="Más Productos"
         />
       </div>
       

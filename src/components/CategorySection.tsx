@@ -6,38 +6,38 @@ const CategorySection = () => {
   const categories = [
     {
       icon: Monitor,
-      title: 'Equipos y Hardware',
-      description: 'Computadoras, servidores y componentes para PyMEs',
+      title: 'Hardware',
+      description: 'Computadoras, laptops y componentes',
       color: 'from-blue-500 to-cyan-500'
     },
     {
       icon: Code,
-      title: 'Software Empresarial',
-      description: 'Licencias y aplicaciones especializadas',
+      title: 'Software',
+      description: 'Licencias y aplicaciones empresariales',
       color: 'from-purple-500 to-pink-500'
     },
     {
       icon: Wifi,
-      title: 'Infraestructura de Red',
-      description: 'Routers, switches y soluciones de conectividad',
+      title: 'Networking',
+      description: 'Routers, switches y soluciones de red',
       color: 'from-green-500 to-teal-500'
     },
     {
       icon: Shield,
-      title: 'Seguridad Informática',
-      description: 'Antivirus, firewalls y protección integral',
+      title: 'Seguridad',
+      description: 'Antivirus, firewalls y protección',
       color: 'from-red-500 to-orange-500'
     },
     {
       icon: Server,
-      title: 'Servidores y Storage',
-      description: 'Infraestructura de almacenamiento empresarial',
+      title: 'Servidores',
+      description: 'Infraestructura y almacenamiento',
       color: 'from-indigo-500 to-blue-500'
     },
     {
       icon: Headphones,
-      title: 'Soporte y Consultoría',
-      description: 'Servicios técnicos especializados',
+      title: 'Accesorios',
+      description: 'Periféricos y complementos',
       color: 'from-yellow-500 to-orange-500'
     }
   ];
@@ -47,11 +47,10 @@ const CategorySection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Categorías de Productos y Servicios
+            Categorías Principales
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Explora nuestras categorías especializadas para encontrar la solución perfecta 
-            que impulse el crecimiento tecnológico de tu PyME
+            Encuentra exactamente lo que necesitas para impulsar tu negocio con nuestras categorías especializadas
           </p>
         </div>
         
