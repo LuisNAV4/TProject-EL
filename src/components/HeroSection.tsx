@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Shield, Truck } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Truck, Building2 } from 'lucide-react';
 
 const HeroSection = () => {
   return (
@@ -10,24 +10,28 @@ const HeroSection = () => {
       <div className="relative container mx-auto px-4 py-20">
         <div className="flex flex-col lg:flex-row items-center">
           <div className="lg:w-1/2 mb-10 lg:mb-0">
+            <div className="flex items-center mb-4">
+              <Building2 className="h-8 w-8 mr-3 text-cyan-400" />
+              <span className="text-cyan-400 font-semibold">Soluciones B2C para PyMEs</span>
+            </div>
             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-              Tecnología de
+              Impulsa tu
               <span className="block bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Vanguardia
+                PyME Tecnológica
               </span>
-              para tu PyME
+              con nuestros servicios
             </h1>
             <p className="text-xl mb-8 text-gray-200 leading-relaxed">
-              Descubre las mejores soluciones tecnológicas diseñadas específicamente 
-              para potenciar el crecimiento de tu pequeña y mediana empresa.
+              Plataforma especializada en ofrecer servicios tecnológicos integrales 
+              para pequeñas y medianas empresas. Desde consultoría hasta implementación completa.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold">
-                Explorar Catálogo
+                Ver Servicios
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-900">
-                Consultar Experto
+                Consulta Gratuita
               </Button>
             </div>
           </div>
@@ -35,8 +39,8 @@ const HeroSection = () => {
           <div className="lg:w-1/2 relative">
             <div className="relative z-10">
               <img
-                src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-                alt="Tecnología empresarial"
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                alt="Equipo trabajando en soluciones tecnológicas"
                 className="rounded-lg shadow-2xl"
               />
             </div>
@@ -45,15 +49,15 @@ const HeroSection = () => {
           </div>
         </div>
         
-        {/* Features */}
+        {/* Value Propositions */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex items-center space-x-4">
             <div className="bg-white bg-opacity-20 p-3 rounded-full">
               <Zap className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-semibold">Instalación Rápida</h3>
-              <p className="text-gray-300">Configuración en menos de 24 horas</p>
+              <h3 className="font-semibold">Implementación Rápida</h3>
+              <p className="text-gray-300">Soluciones listas en 48 horas</p>
             </div>
           </div>
           
@@ -62,8 +66,8 @@ const HeroSection = () => {
               <Shield className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-semibold">Garantía Extendida</h3>
-              <p className="text-gray-300">Soporte técnico especializado</p>
+              <h3 className="font-semibold">Soporte Dedicado</h3>
+              <p className="text-gray-300">Acompañamiento personalizado</p>
             </div>
           </div>
           
@@ -72,8 +76,8 @@ const HeroSection = () => {
               <Truck className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-semibold">Envío Gratuito</h3>
-              <p className="text-gray-300">En compras superiores a $50,000</p>
+              <h3 className="font-semibold">Sin Costos Ocultos</h3>
+              <p className="text-gray-300">Precios transparentes y fijos</p>
             </div>
           </div>
         </div>
