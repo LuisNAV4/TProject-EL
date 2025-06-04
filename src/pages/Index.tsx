@@ -1,13 +1,13 @@
-
-import React, { useState } from 'react';
-import Header from '../components/Header';
-import HeroSection from '../components/HeroSection';
-import CategorySection from '../components/CategorySection';
-import ProductGrid from '../components/ProductGrid';
-import Cart from '../components/Cart';
-import Footer from '../components/Footer';
-import { sampleProducts } from '../data/products';
-import { Product } from '../components/ProductCard';
+import React, { useState } from "react";
+import Header from "../components/Header";
+import HeroSection from "../components/HeroSection";
+import CategorySection from "../components/CategorySection";
+import ProductGrid from "../components/ProductGrid";
+import Cart from "../components/Cart";
+import Footer from "../components/Footer";
+import { sampleProducts } from "../data/products";
+import { Product } from "../components/ProductCard";
+import { WhatsAppFloat } from "@/components/ui/whatsapp";
 
 interface CartItem extends Product {
   quantity: number;
@@ -18,10 +18,10 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleAddToCart = (product: Product) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
-        return prevItems.map(item =>
+        return prevItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
@@ -36,19 +36,20 @@ const Index = () => {
     if (quantity === 0) {
       handleRemoveItem(id);
     } else {
-      setCartItems(prevItems =>
-        prevItems.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        )
+      setCartItems((prevItems) =>
+        prevItems.map((item) => (item.id === id ? { ...item, quantity } : item))
       );
     }
   };
 
   const handleRemoveItem = (id: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const cartItemCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   // Featured products (first 4 from sample)
   const featuredProducts = sampleProducts.slice(0, 4);
@@ -59,17 +60,16 @@ const Index = () => {
         cartItemCount={cartItemCount}
         onCartClick={() => setIsCartOpen(true)}
       />
-      
+      <WhatsAppFloat />
       <HeroSection />
-      
-      <CategorySection />
-      
+
       <ProductGrid
         products={featuredProducts}
         onAddToCart={handleAddToCart}
         title="Productos Destacados"
       />
-      
+      <CategorySection />
+
       <div className="bg-gray-50">
         <ProductGrid
           products={sampleProducts.slice(4)}
@@ -77,7 +77,6 @@ const Index = () => {
           title="Más Productos"
         />
       </div>
-      
       <Cart
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -85,7 +84,7 @@ const Index = () => {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
       />
-      
+
       <Footer />
     </div>
   );

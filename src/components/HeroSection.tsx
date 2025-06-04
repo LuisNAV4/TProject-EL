@@ -26,8 +26,9 @@ const HeroSection = () => {
                 Ver Productos
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-900">
+              <Button size="lg" variant="outline" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold border-blue-900">
                 Ofertas del Día
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
           </div>
@@ -73,7 +74,7 @@ const HeroSection = () => {
             </div>
             <div>
               <h3 className="font-semibold">Entrega Rápida</h3>
-              <p className="text-gray-300">Recibe tu pedido en 24-48 horas</p>
+              <p className="text-gray-300">Recibe tu pedido de 1 a 4 horas</p>
             </div>
           </div>
         </div>
