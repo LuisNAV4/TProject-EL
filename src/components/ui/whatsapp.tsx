@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MessageCircleMore, X } from "lucide-react";
+import { MessageCircle, X } from "lucide-react";
 import WhatsappLogo from "@/images/whatsapp-logo.svg";
 
 // Mensaje de ejemplo del sistema
@@ -63,7 +63,7 @@ export const WhatsAppFloat = () => {
           onMouseOver={e => (e.currentTarget.style.backgroundColor = "#128c7e")}
           onMouseOut={e => (e.currentTarget.style.backgroundColor = "#25d366")}
         >
-          <MessageCircleMore style={{ color: "white", width: "40px", height: "40px" }} />
+          <MessageCircle style={{ color: "white", width: "40px", height: "40px" }} />
         </button>
       )}
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -76,6 +75,8 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
         {/* Navigation */}
         <nav className={`${isMenuOpen ? 'block' : 'hidden'} md:block pb-4`}>
           <ul className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8">
+            {/* Botón central solo visible en mobile */}
+
             {categories.map((category) => (
               <li key={category}>
                 <a
@@ -86,6 +87,14 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
                 </a>
               </li>
             ))}
+            {isMenuOpen && (
+              <li className="md:hidden flex justify-center mb-2">
+                <button className="w-full flex items-center justify-center bg-blue-600 text-white font-semibold rounded-lg py-2 transition-colors duration-200">
+                  <User className="h-5 w-5 mr-2" />
+                  Iniciar sesión
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
 
