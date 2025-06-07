@@ -80,7 +80,7 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           <Button
             onClick={() => onAddToCart(product)}
             disabled={!product.inStock}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:from-[var(--color-primary)] hover:to-[var(--color-secondary)] hover:brightness-110 text-white"
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
             Agregar

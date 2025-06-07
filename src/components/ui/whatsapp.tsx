@@ -33,6 +33,7 @@ export const WhatsAppFloat = () => {
         timestamp: new Date(),
       },
     ]);
+    setInput(""); // Limpiar el input después de enviar
 
     // Aquí podrías agregar lógica para respuestas automáticas si lo deseas
   };
@@ -96,7 +97,7 @@ export const WhatsAppFloat = () => {
                 href="https://wa.me/+584127750241?text=Hola%2C%20quiero%20hacer%20una%20consulta"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center hover:bg-[#075E54] rounded-full w-7 h-7 ml-0 transition-colors"
+                className="flex items-center justify-center hover:bg-[#128c7e] rounded-full w-7 h-7 ml-0 transition-colors"
                 title="Chatear por WhatsApp"
               >
                 <img src={WhatsappLogo} alt="WhatsApp" className="w-10 h-10" />
@@ -168,7 +169,8 @@ export const WhatsAppFloat = () => {
                 outline: "none",
               }}
               onKeyDown={e => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                // Solo enviar si es Enter y no está repitiendo (evita mantener pulsado)
+                if (e.key === "Enter" && !e.shiftKey && !e.repeat) {
                   handleSend();
                 }
               }}

@@ -2,17 +2,18 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Shield, Truck } from 'lucide-react';
+import Portada from '@/images/IntroImagen.webp'
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white overflow-hidden">
+    <section className="relative bg-gradient-to-br from-[var(--color-hero-primary)] via-[var(--color-hero-secondary)] to-[var(--color-hero-tertiary)] text-white overflow-hidden">
       <div className="absolute inset-0 bg-black opacity-20"></div>
       <div className="relative container mx-auto px-4 py-20">
         <div className="flex flex-col lg:flex-row items-center">
           <div className="lg:w-1/2 mb-10 lg:mb-0">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
               Tecnología de
-              <span className="block bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent brightness-100">
                 Última Generación
               </span>
               a tu alcance
@@ -26,7 +27,7 @@ const HeroSection = () => {
                 Ver Productos
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold border-blue-900">
+              <Button size="lg" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold">
                 Ofertas del Día
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -36,13 +37,13 @@ const HeroSection = () => {
           <div className="lg:w-1/2 relative">
             <div className="relative z-10">
               <img
-                src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                src={Portada}
                 alt="Productos tecnológicos"
                 className="rounded-lg shadow-2xl"
               />
             </div>
-            <div className="absolute -top-4 -left-4 w-20 h-20 bg-cyan-400 rounded-full opacity-20 animate-pulse"></div>
-            <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-purple-400 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute -top-4 -left-4 w-20 h-20 bg-[var(--color-hero-tertiary)] rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-[var(--color-hero-primary)] rounded-full opacity-20 animate-pulse"></div>
           </div>
         </div>
         

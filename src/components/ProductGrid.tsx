@@ -13,7 +13,7 @@ const ProductGrid = ({ products, onAddToCart, title }: ProductGridProps) => {
     <section className="py-12">
       <div className="container mx-auto px-4">
         {title && (
-          <h2 className="text-3xl font-bold text-center mb-10 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold text-center mb-10 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent">
             {title}
           </h2>
         )}
