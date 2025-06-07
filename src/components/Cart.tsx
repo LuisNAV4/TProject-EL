@@ -90,7 +90,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartPr
         {items.length > 0 && (
           <div className="border-t p-6">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-xl font-bold">Total: ${total.toLocaleString()}</span>
+              <span className="text-xl font-bold">Total: REF {total.toLocaleString()}</span>
             </div>
             <div className="flex space-x-4">
               <Button variant="outline" onClick={onClose} className="flex-1">

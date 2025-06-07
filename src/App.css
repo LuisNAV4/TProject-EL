@@ -1,13 +1,13 @@
 :root {
-  --color-primary: #eb2525;      /* Azul principal */
-  --color-secondary: #a420d8;    /* Morado secundario */
+  --color-primary: #32afe0;      /* Azul principal */
+  --color-secondary: #06063b;    /* Morado secundario */
   --color-border: #d1d5db;       /* Gris borde */
   --color-danger: #ef4444;       /* Rojo para alertas */
   --color-bg: #ffffff;           /* Blanco para el fondo */
   --color-text: #1e293b;         /* Color del texto */
-  --color-muted: #64748b;
-  --color-hero-primary: #881cc7;
-  --color-hero-secondary: #0c3a7a;  
+  --color-muted: #000000;
+  --color-hero-primary: #1c74c7;
+  --color-hero-secondary: #0c2f7a;  
   --color-hero-tertiary: #010e20;   /* Color atenuado para textos secundarios */
 }
 

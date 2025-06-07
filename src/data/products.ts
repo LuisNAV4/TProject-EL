@@ -36,7 +36,7 @@ export const sampleProducts: Product[] = [
   {
     id: 4,
     name: "Samsung Galaxy S24 Ultra 512GB",
-    price: 32999,
+    price: 28555,
     originalPrice: 35999,
     image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
     rating: 4.6,

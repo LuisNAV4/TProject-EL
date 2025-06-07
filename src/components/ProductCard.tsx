@@ -68,11 +68,11 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-gray-900">
-              ${product.price.toLocaleString()}
+              REF: {product.price.toLocaleString()}
             </span>
             {product.originalPrice && (
               <span className="text-sm text-gray-500 line-through">
-                ${product.originalPrice.toLocaleString()}
+                REF: {product.originalPrice.toLocaleString()}
               </span>
             )}
           </div>
