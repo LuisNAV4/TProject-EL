@@ -1,70 +1,70 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
 import WhatsappLogo from "@/images/whatsapp-logo.svg";
+import { io } from "socket.io-client";
 
-// Mensaje de ejemplo del sistema
-const initialMessages = [
-  {
-    from: "admin",
-    text: "¡Hola! ¿En qué podemos ayudarte?",
-    timestamp: new Date(),
-  },
-];
+// Solo una instancia de socket
+const socket = io("http://localhost:3000");
+
+const USER_ID = "1234";
 
 export const WhatsAppFloat = () => {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState(() => {
-    const saved = localStorage.getItem("whatsapp-messages");
-    if (saved) {
-      // Convierte las fechas de string a Date si es necesario
-      return JSON.parse(saved).map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(format12Hour(msg.timestamp)),
-      }));
-    }
-    return initialMessages;
-  });
+  const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Scroll automático al enviar mensaje
+  // Recibir mensajes en tiempo real
+  useEffect(() => {
+    socket.on("nuevoMensaje", (mensaje: any) => {
+      setMessages((prev) => [...prev, mensaje]);
+    });
+    return () => {
+      socket.off("nuevoMensaje");
+    };
+  }, []);
+
+  // Scroll automático y persistencia
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    // Guarda mensajes en localStorage cada vez que cambian
-    localStorage.setItem("whatsapp-messages", JSON.stringify(messages));
+    localStorage.setItem(
+      "whatsapp-messages",
+      JSON.stringify(
+        messages.map((msg) => ({
+          ...msg,
+          timestamp:
+            msg.timestamp instanceof Date
+              ? msg.timestamp.toISOString()
+              : msg.timestamp,
+        }))
+      )
+    );
   }, [messages, open]);
+  useEffect(() => {
+    const storedMessages = localStorage.getItem("whatsapp-messages");
+    if (storedMessages) {
+      setMessages(JSON.parse(storedMessages));
+    }
+  }, []);
+
 
   const handleSend = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!input.trim()) return;
-    setMessages([
-      ...messages,
-      {
-        from: "user",
-        id: "123",
-        name: "Luis Navarro",
-        text: input,
-        timestamp: new Date(),
-      },
-    ]);
-    setInput(""); // Limpiar el input después de enviar
+    const now = new Date();
+    const msg = {
+      from: "user",
+      id: USER_ID,
+      user: "Luis Navarro",
+      text: input,
+      timestamp: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+    };
+    // Emitir el mensaje al servidor
+    socket.emit("nuevoMensaje", msg);
+    // No agregarlo localmente aquí, solo lo agregará el socket.on("nuevoMensaje")
+    setInput("");
+  };
 
-    // Aquí podrías agregar lógica para respuestas automáticas
-    // 
-    //  si lo deseas
-  };
-  const format12Hour = (timestamp: string) => {
-    // Si ya está en formato 12h, retorna igual
-    if (/AM|PM/i.test(timestamp)) return timestamp;
-    // Intenta convertir de "HH:mm" a 12h
-    const [h, m] = timestamp.split(":");
-    if (!h || !m) return timestamp;
-    let hour = parseInt(h, 10);
-    const minute = m.replace(/[^\d]/g, "");
-    const ampm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${ampm}`;
-  };
   return (
     <>
       {/* Botón flotante */}

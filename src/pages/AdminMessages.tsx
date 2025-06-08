@@ -1,76 +1,103 @@
-import { randomUUID } from "crypto";
 import React, { useState, useRef, useEffect } from "react";
+import { io } from "socket.io-client";
 
-// Datos simulados de chats y mensajes
-const chats = [
-  {
-    id: 1,
-    user: "Luis Perez",
-    lastMessage: "Hola, tengo una duda sobre un producto.",
-    messages: [
-      { from: "user", text: "Hola, tengo una duda sobre un producto.", timestamp: "10:00 AM" },
-      { from: "admin", text: "¡Hola! ¿En qué puedo ayudarte?", timestamp: "10:01 AM" },
-      { from: "user", text: "¿Tienen envío gratis?", timestamp: "10:02 AM" },
-    ],
-    active: true,
-  },
-  {
-    id: 2,
-    user: "Maria Gomez",
-    lastMessage: "Gracias por la información.",
-    messages: [
-      { from: "user", text: "¿Cuánto tarda el envío?", timestamp: "9:00 AM" },
-      { from: "admin", text: "Depende de tu ubicación, normalmente 2-3 días.", timestamp: "9:01 AM" },
-      { from: "user", text: "Gracias por la información.", timestamp: "9:02 AM" },
-    ],
-    active: false,
-  },
-];
+// Instancia única de socket
+const socket = io("http://localhost:3000");
+
+// Estructura de chat: cada usuario tiene su propio chat
+type Message = {
+  from: string;
+  user: string;
+  text: string;
+  timestamp: string;
+  id: string;
+};
+type Chat = {
+  id: string;
+  user: string;
+  lastMessage: string;
+  messages: Message[];
+  active: boolean;
+};
 
 const AdminMessages: React.FC = () => {
-  const [selectedChat, setSelectedChat] = useState(chats[0]);
+  const [chatList, setChatList] = useState<Chat[]>([]);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  // Recibir mensajes en tiempo real por socket
+  useEffect(() => {
+    socket.on("nuevoMensaje", (mensaje: Message) => {
+      setChatList((prevChats) => {
+        const idx = prevChats.findIndex(
+          (c) => c.id === mensaje.id || c.user === mensaje.user
+        );
+        if (idx !== -1) {
+          // Actualizar chat existente
+          const updated = {
+            ...prevChats[idx],
+            lastMessage: mensaje.text,
+            messages: [...prevChats[idx].messages, mensaje],
+          };
+          const newChats = [...prevChats];
+          newChats[idx] = updated;
+          return newChats;
+        } else {
+          // Nuevo chat
+          const nuevoChat: Chat = {
+            id: mensaje.id,
+            user: mensaje.user,
+            lastMessage: mensaje.text,
+            messages: [mensaje],
+            active: true,
+          };
+          return [nuevoChat, ...prevChats];
+        }
+      });
+
+      // Si el chat abierto es el que recibe el mensaje, actualízalo
+      setSelectedChat((prev) => {
+        if (!prev) return prev;
+        if (mensaje.id === prev.id || mensaje.user === prev.user) {
+          return {
+            ...prev,
+            messages: [...prev.messages, mensaje],
+          };
+        }
+        return prev;
+      });
+    });
+    return () => {
+      socket.off("nuevoMensaje");
+    };
+  }, []);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [selectedChat, selectedChat.messages]);
+  }, [selectedChat?.messages]);
 
   const handleSend = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!input.trim()) return;
-    // Actualiza solo el chat seleccionado
-    setSelectedChat((prev) => {
-      const updated = {
-        ...prev,
-        messages: [
-          ...prev.messages,
-          {
-            from: "admin",
-            user: "Andres Ardiles",
-            text: input,
-            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          },
-        ],
-      };
-      // Actualiza también en la lista de chats
-      const idx = chats.findIndex((c) => c.id === prev.id);
-      chats[idx] = updated;
-      return updated;
-    });
+    if (!input.trim() || !selectedChat) return;
+    const msg: Message = {
+      from: "admin",
+      user: "Andres Ardiles",
+      text: input,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      id: selectedChat.id,
+    };
+    socket.emit("nuevoMensaje", msg);
+    // No agregar el mensaje localmente aquí, solo lo agregará el socket.on("nuevoMensaje")
     setInput("");
   };
 
-  // Botón para volver atrás (simulado, puedes conectar con router si lo usas)
   const handleBack = () => {
-    // Aquí podrías usar router o navegación real
     window.history.back();
   };
 
   const format12Hour = (timestamp: string) => {
-    // Si ya está en formato 12h, retorna igual
     if (/AM|PM/i.test(timestamp)) return timestamp;
-    // Intenta convertir de "HH:mm" a 12h
     const [h, m] = timestamp.split(":");
     if (!h || !m) return timestamp;
     let hour = parseInt(h, 10);
@@ -95,14 +122,19 @@ const AdminMessages: React.FC = () => {
             </svg>
           </button>
           <span className="font-bold text-lg flex-1 text-center">Bandeja de entrada</span>
-          <span className="w-8" /> {/* Espaciador */}
+          <span className="w-8" />
         </div>
         <div className="flex-1 overflow-y-auto bg-[var(--color-bg)]">
-          {chats.map((chat) => (
+          {chatList.length === 0 && (
+            <div className="p-4 text-center text-gray-500">
+              No hay chats
+            </div>
+          )}
+          {chatList.map((chat) => (
             <div
               key={chat.id}
               className={`cursor-pointer px-5 py-4 border-b border-[var(--color-border)] transition-all
-                ${selectedChat.id === chat.id
+                ${selectedChat && selectedChat.id === chat.id
                   ? "bg-[var(--color-primary)] text-lg text-white font-semibold"
                   : "hover:bg-[var(--color-secondary)] hover:text-white"
                 } flex items-center justify-between`}
@@ -114,7 +146,6 @@ const AdminMessages: React.FC = () => {
               </div>
               <div className="ml-4 text-xs text-right text-[var(--color-muted)] min-w-[60px]">
                 {
-                  // Mostrar el timestamp del último mensaje en formato 12h
                   chat.messages.length > 0
                     ? format12Hour(chat.messages[chat.messages.length - 1].timestamp)
                     : ""
@@ -129,26 +160,32 @@ const AdminMessages: React.FC = () => {
         {/* Encabezado */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-[var(--color-border)] bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]">
           <div>
-            <div className="font-bold text-lg text-white">{selectedChat.user}</div>
+            <div className="font-bold text-lg text-white">{selectedChat ? selectedChat.user : "Selecciona un chat"}</div>
             <div className="text-xs text-white">Usuario</div>
           </div>
         </div>
         {/* Mensajes */}
         <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col gap-3 bg-[var(--color-bg)]"
           style={{ background: "linear-gradient(135deg, #f8fafc 80%, #e0e7ff 100%)" }}>
-          {selectedChat.messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`max-w-[70%] px-5 py-3 rounded-2xl text-sm shadow
-                ${msg.from === "user"
-                  ? "bg-[var(--color-border)] text-[var(--color-text)] self-start rounded-bl-none"
-                  : "bg-[var(--color-primary)] text-white self-end rounded-br-none"
-                }`}
-            >
-              <div>{msg.text}</div>
-              <div className="text-[10px] text-[var(--color-muted)] mt-1 text-right">{format12Hour(msg.timestamp)}</div>
+          {!selectedChat || selectedChat.messages.length === 0 ? (
+            <div className="text-center text-gray-500 text-sm py-4">
+              No hay mensajes en este chat.
             </div>
-          ))}
+          ) : (
+            selectedChat.messages.map((msg, idx) => (
+              <div
+                key={idx}
+                className={`max-w-[70%] px-5 py-3 rounded-2xl text-sm shadow
+                  ${msg.from === "user"
+                    ? "bg-[var(--color-border)] text-[var(--color-text)] self-start rounded-bl-none"
+                    : "bg-[var(--color-primary)] text-white self-end rounded-br-none"
+                  }`}
+              >
+                <div>{msg.text}</div>
+                <div className="text-[10px] text-[var(--color-muted)] mt-1 text-right">{format12Hour(msg.timestamp)}</div>
+              </div>
+            ))
+          )}
           <div ref={messagesEndRef} />
         </div>
         {/* Input para enviar mensajes */}
@@ -167,11 +204,12 @@ const AdminMessages: React.FC = () => {
                 handleSend();
               }
             }}
+            disabled={!selectedChat}
           />
           <button
             type="submit"
             className="bg-[var(--color-primary)] hover:bg-[var(--color-secondary)] text-white font-semibold rounded-lg px-6 py-2 transition-colors disabled:opacity-60"
-            disabled={!input.trim()}
+            disabled={!input.trim() || !selectedChat}
           >
             Enviar
           </button>
