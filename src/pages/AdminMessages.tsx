@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { io } from "socket.io-client";
+import { Menu, X } from "lucide-react";
 
 // Instancia única de socket
 const socket = io("http://localhost:3000");
@@ -19,6 +20,7 @@ type Chat = {
   lastMessage: string;
   messages: Message[];
   active: boolean;
+  unreadCount?: number;
 };
 
 const AdminMessages: React.FC = () => {
@@ -26,6 +28,8 @@ const AdminMessages: React.FC = () => {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [input, setInput] = useState("");
   const [isMobileView, setIsMobileView] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [totalUnread, setTotalUnread] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Detectar si estamos en vista móvil
@@ -51,6 +55,9 @@ const AdminMessages: React.FC = () => {
             ...prevChats[idx],
             lastMessage: mensaje.text,
             messages: [...prevChats[idx].messages, mensaje],
+            unreadCount: (mensaje.from === "user" && (!selectedChat || selectedChat.id !== mensaje.id)) 
+              ? (prevChats[idx].unreadCount || 0) + 1 
+              : prevChats[idx].unreadCount || 0
           };
           const newChats = [...prevChats];
           newChats[idx] = updated;
@@ -63,6 +70,7 @@ const AdminMessages: React.FC = () => {
             lastMessage: mensaje.text,
             messages: [mensaje],
             active: true,
+            unreadCount: mensaje.from === "user" ? 1 : 0
           };
           return [nuevoChat, ...prevChats];
         }
@@ -83,7 +91,13 @@ const AdminMessages: React.FC = () => {
     return () => {
       socket.off("nuevoMensaje");
     };
-  }, []);
+  }, [selectedChat]);
+
+  // Calcular total de mensajes no leídos
+  useEffect(() => {
+    const total = chatList.reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
+    setTotalUnread(total);
+  }, [chatList]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -100,7 +114,6 @@ const AdminMessages: React.FC = () => {
       id: selectedChat.id,
     };
     socket.emit("nuevoMensaje", msg);
-    // No agregar el mensaje localmente aquí, solo lo agregará el socket.on("nuevoMensaje")
     setInput("");
   };
 
@@ -110,15 +123,19 @@ const AdminMessages: React.FC = () => {
 
   const handleChatSelect = (chat: Chat) => {
     setSelectedChat(chat);
+    // Marcar como leído
+    setChatList(prevChats => 
+      prevChats.map(c => 
+        c.id === chat.id ? { ...c, unreadCount: 0 } : c
+      )
+    );
     if (isMobileView) {
-      setIsMobileView(false); // Hide sidebar on mobile when chat is selected
+      setShowSidebar(false);
     }
   };
 
-  const handleBackToList = () => {
-    if (isMobileView) {
-      setSelectedChat(null);
-    }
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar);
   };
 
   const format12Hour = (timestamp: string) => {
@@ -134,10 +151,23 @@ const AdminMessages: React.FC = () => {
 
   return (
     <div className="fixed inset-0 flex bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secondary)]/10">
-      {/* Lista de chats - Responsive */}
+      {/* Overlay para cerrar sidebar en móvil */}
+      {isMobileView && showSidebar && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
+      {/* Lista de chats - Sidebar */}
       <aside className={`
-        ${isMobileView && selectedChat ? 'hidden' : 'flex'} 
-        w-full md:w-80 lg:w-96 md:max-w-none bg-white flex-col border-r border-[var(--color-border)] shadow-lg z-10
+        ${isMobileView 
+          ? `fixed left-0 top-0 h-full w-80 transform transition-transform duration-300 z-50 ${
+              showSidebar ? 'translate-x-0' : '-translate-x-full'
+            }`
+          : 'w-80 lg:w-96'
+        } 
+        bg-white flex-col border-r border-[var(--color-border)] shadow-lg flex
       `}>
         <div className="flex items-center justify-between p-3 md:p-4 border-b border-[var(--color-border)] bg-[var(--color-primary)] text-white">
           <button
@@ -150,7 +180,15 @@ const AdminMessages: React.FC = () => {
             </svg>
           </button>
           <span className="font-bold text-base md:text-lg flex-1 text-center">Bandeja de entrada</span>
-          <span className="w-8" />
+          {isMobileView && (
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="rounded-full hover:bg-[var(--color-secondary)]/30 p-2 transition-colors"
+              title="Cerrar"
+            >
+              <X size={20} />
+            </button>
+          )}
         </div>
         <div className="flex-1 overflow-y-auto bg-[var(--color-bg)]">
           {chatList.length === 0 && (
@@ -165,11 +203,18 @@ const AdminMessages: React.FC = () => {
                 ${selectedChat && selectedChat.id === chat.id
                   ? "bg-[var(--color-primary)] text-white font-semibold"
                   : "hover:bg-[var(--color-secondary)] hover:text-white"
-                } flex items-center justify-between`}
+                } flex items-center justify-between relative`}
               onClick={() => handleChatSelect(chat)}
             >
               <div className="flex flex-col flex-1 min-w-0">
-                <div className="font-semibold truncate text-sm md:text-base">{chat.user}</div>
+                <div className="font-semibold truncate text-sm md:text-base flex items-center">
+                  {chat.user}
+                  {(chat.unreadCount || 0) > 0 && (
+                    <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {chat.unreadCount}
+                    </span>
+                  )}
+                </div>
                 <div className="text-xs md:text-sm truncate opacity-80">{chat.lastMessage}</div>
               </div>
               <div className="ml-2 md:ml-4 text-xs text-right text-[var(--color-muted)] min-w-[50px] md:min-w-[60px]">
@@ -184,27 +229,29 @@ const AdminMessages: React.FC = () => {
         </div>
       </aside>
 
-      {/* Panel de conversación - Responsive */}
-      <main className={`
-        ${isMobileView && !selectedChat ? 'hidden' : 'flex'} 
-        flex-1 flex-col bg-white shadow-lg overflow-hidden
-      `}>
+      {/* Panel de conversación - Main */}
+      <main className="flex-1 flex flex-col bg-white shadow-lg overflow-hidden">
         {/* Encabezado */}
         <div className="flex items-center justify-between px-4 md:px-8 py-4 md:py-5 border-b border-[var(--color-border)] bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]">
-          {/* Botón de regreso en móvil */}
+          {/* Botón hamburger en móvil */}
           {isMobileView && (
             <button
-              onClick={handleBackToList}
-              className="rounded-full hover:bg-[var(--color-secondary)]/30 p-2 transition-colors mr-2 md:hidden"
-              title="Volver a la lista"
+              onClick={toggleSidebar}
+              className="rounded-full hover:bg-[var(--color-secondary)]/30 p-2 transition-colors mr-2 relative"
+              title="Abrir bandeja"
             >
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M15 19l-7-7 7-7" />
-              </svg>
+              <Menu size={20} stroke="white" />
+              {totalUnread > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalUnread > 99 ? '99+' : totalUnread}
+                </span>
+              )}
             </button>
           )}
           <div>
-            <div className="font-bold text-base md:text-lg text-white">{selectedChat ? selectedChat.user : "Selecciona un chat"}</div>
+            <div className="font-bold text-base md:text-lg text-white">
+              {selectedChat ? selectedChat.user : "Selecciona un chat"}
+            </div>
             <div className="text-xs md:text-sm text-white">Usuario</div>
           </div>
         </div>
@@ -212,7 +259,17 @@ const AdminMessages: React.FC = () => {
         {/* Mensajes */}
         <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 md:py-6 flex flex-col gap-2 md:gap-3 bg-[var(--color-bg)]"
           style={{ background: "linear-gradient(135deg, #f8fafc 80%, #e0e7ff 100%)" }}>
-          {!selectedChat || selectedChat.messages.length === 0 ? (
+          {!selectedChat ? (
+            <div className="text-center text-gray-500 text-sm py-4 flex flex-col items-center justify-center h-full">
+              <div className="text-lg mb-2">💬</div>
+              <div>Selecciona un chat para comenzar</div>
+              {isMobileView && (
+                <div className="text-xs mt-2 opacity-70">
+                  Toca el menú hamburger para ver tus conversaciones
+                </div>
+              )}
+            </div>
+          ) : selectedChat.messages.length === 0 ? (
             <div className="text-center text-gray-500 text-sm py-4">
               No hay mensajes en este chat.
             </div>
