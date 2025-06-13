@@ -88,7 +88,7 @@ const ProductCatalog = () => {
               <Checkbox
                 id={category}
                 checked={selectedCategories.includes(category)}
-                onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                onCheckedChange={(checked) => handleCategoryChange(category, checked === true)}
               />
               <label htmlFor={category} className="text-sm">{category}</label>
             </div>
@@ -120,7 +120,7 @@ const ProductCatalog = () => {
         <Checkbox
           id="inStock"
           checked={showInStock}
-          onCheckedChange={setShowInStock}
+          onCheckedChange={(checked) => setShowInStock(checked === true)}
         />
         <label htmlFor="inStock" className="text-sm">Solo productos en stock</label>
       </div>
