@@ -18,15 +18,30 @@ export interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
+  onProductClick?: (product: Product) => void;
 }
 
-const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart, onProductClick }: ProductCardProps) => {
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
+  const handleCardClick = () => {
+    if (onProductClick) {
+      onProductClick(product);
+    }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita que se active el click del card
+    onAddToCart(product);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+    <div 
+      className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="relative">
         <img
           src={product.image}
@@ -78,7 +93,7 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           </div>
           
           <Button
-            onClick={() => onAddToCart(product)}
+            onClick={handleAddToCart}
             disabled={!product.inStock}
             className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:from-[var(--color-primary)] hover:to-[var(--color-secondary)] hover:brightness-110 text-white"
           >

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
@@ -12,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import ProductCard, { Product } from '../components/ProductCard';
 import { sampleProducts } from '../data/products';
+import { productNameToSlug } from '../utils/urlUtils';
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
@@ -74,7 +74,8 @@ const ProductCatalog = () => {
   };
 
   const handleProductClick = (product: Product) => {
-    navigate(`/product/${product.id}`);
+    const slug = productNameToSlug(product.name);
+    navigate(`/product/${slug}`);
   };
 
   const FilterContent = () => (
@@ -261,16 +262,12 @@ const ProductCatalog = () => {
                   : 'space-y-4'
               }>
                 {filteredProducts.map(product => (
-                  <div
+                  <ProductCard
                     key={product.id}
-                    onClick={() => handleProductClick(product)}
-                    className="cursor-pointer"
-                  >
-                    <ProductCard
-                      product={product}
-                      onAddToCart={handleAddToCart}
-                    />
-                  </div>
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                    onProductClick={handleProductClick}
+                  />
                 ))}
               </div>
             )}

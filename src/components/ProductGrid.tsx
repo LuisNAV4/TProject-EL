@@ -5,10 +5,11 @@ import ProductCard, { Product } from './ProductCard';
 interface ProductGridProps {
   products: Product[];
   onAddToCart: (product: Product) => void;
+  onProductClick?: (product: Product) => void;
   title?: string;
 }
 
-const ProductGrid = ({ products, onAddToCart, title }: ProductGridProps) => {
+const ProductGrid = ({ products, onAddToCart, onProductClick, title }: ProductGridProps) => {
   return (
     <section className="py-12">
       <div className="container mx-auto px-4">
@@ -23,6 +24,7 @@ const ProductGrid = ({ products, onAddToCart, title }: ProductGridProps) => {
               key={product.id}
               product={product}
               onAddToCart={onAddToCart}
+              onProductClick={onProductClick}
             />
           ))}
         </div>

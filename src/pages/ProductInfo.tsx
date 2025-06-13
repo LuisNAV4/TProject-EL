@@ -1,22 +1,33 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { sampleProducts } from '../data/products';
-import { Product } from '../components/ProductCard';
 import { useToast } from '@/hooks/use-toast';
+import { useCart } from '../contexts/CartContext';
+import { findProductBySlug } from '../utils/urlUtils';
+import Cart from '../components/Cart';
+import Header from '../components/Header';
 
 const ProductInfo = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  
+  const {
+    cartItems,
+    addToCart,
+    updateQuantity: updateCartQuantity,
+    removeItem,
+    cartItemCount,
+    isCartOpen,
+    setIsCartOpen,
+  } = useCart();
 
-  const product = sampleProducts.find(p => p.id === parseInt(id || '0'));
+  const product = findProductBySlug(slug || '');
 
   if (!product) {
     return (
@@ -34,6 +45,10 @@ const ProductInfo = () => {
     : 0;
 
   const handleAddToCart = () => {
+    // Agregar la cantidad especificada al carrito
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
     toast({
       title: "Producto agregado",
       description: `${quantity} ${product.name} agregado al carrito`,
@@ -49,6 +64,11 @@ const ProductInfo = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header
+        cartItemCount={cartItemCount}
+        onCartClick={() => setIsCartOpen(true)}
+      />
+      
       {/* Header */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
@@ -203,6 +223,15 @@ const ProductInfo = () => {
           </div>
         </div>
       </div>
+
+      {/* Cart Component */}
+      <Cart
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cartItems}
+        onUpdateQuantity={updateCartQuantity}
+        onRemoveItem={removeItem}
+      />
     </div>
   );
 };

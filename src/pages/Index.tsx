@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+
+import React from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import HeroSection from "../components/HeroSection";
 import CategorySection from "../components/CategorySection";
@@ -8,48 +10,25 @@ import Footer from "../components/Footer";
 import { sampleProducts } from "../data/products";
 import { Product } from "../components/ProductCard";
 import { WhatsAppFloat } from "@/components/ui/whatsapp";
-
-interface CartItem extends Product {
-  quantity: number;
-}
+import { useCart } from "../contexts/CartContext";
+import { productNameToSlug } from "../utils/urlUtils";
 
 const Index = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const navigate = useNavigate();
+  const {
+    cartItems,
+    addToCart,
+    updateQuantity,
+    removeItem,
+    cartItemCount,
+    isCartOpen,
+    setIsCartOpen,
+  } = useCart();
 
-  const handleAddToCart = (product: Product) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [...prevItems, { ...product, quantity: 1 }];
-      }
-    });
+  const handleProductClick = (product: Product) => {
+    const slug = productNameToSlug(product.name);
+    navigate(`/product/${slug}`);
   };
-
-  const handleUpdateQuantity = (id: number, quantity: number) => {
-    if (quantity === 0) {
-      handleRemoveItem(id);
-    } else {
-      setCartItems((prevItems) =>
-        prevItems.map((item) => (item.id === id ? { ...item, quantity } : item))
-      );
-    }
-  };
-
-  const handleRemoveItem = (id: number) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
-
-  const cartItemCount = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
 
   // Featured products (first 4 from sample)
   const featuredProducts = sampleProducts.slice(0, 4);
@@ -65,7 +44,8 @@ const Index = () => {
 
       <ProductGrid
         products={featuredProducts}
-        onAddToCart={handleAddToCart}
+        onAddToCart={addToCart}
+        onProductClick={handleProductClick}
         title="Productos Destacados"
       />
       <CategorySection />
@@ -73,7 +53,8 @@ const Index = () => {
       <div className="bg-gray-50">
         <ProductGrid
           products={sampleProducts.slice(4)}
-          onAddToCart={handleAddToCart}
+          onAddToCart={addToCart}
+          onProductClick={handleProductClick}
           title="Más Productos"
         />
       </div>
@@ -81,8 +62,8 @@ const Index = () => {
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         items={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeItem}
       />
 
       <Footer />
