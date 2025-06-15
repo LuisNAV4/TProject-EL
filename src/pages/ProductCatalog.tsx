@@ -16,6 +16,7 @@ import { productNameToSlug } from '../utils/urlUtils';
 import CatalogHeader from '@/components/CatalogHeader';
 import Cart from '@/components/Cart';
 import { usarCarrito } from '@/contexts/CartContext';
+import { WhatsAppFloat } from '@/components/ui/whatsapp';
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const ProductCatalog = () => {
 
   const manejarClicProducto = (producto: Product) => {
     const slug = productNameToSlug(producto.name);
-    navigate(`/catalogo/${slug}`);
+    navigate(`/product/${slug}`);
   };
 
   const ContenidoFiltros = () => (
@@ -136,7 +137,10 @@ const ProductCatalog = () => {
   );
 
   return (
+    
+
     <div className="min-h-screen bg-gray-50">
+      <WhatsAppFloat />
       <CatalogHeader contadorArticulosCarrito={contadorArticulosCarrito} alClicCarrito={() => establecerMostrarCarrito(true)} />
       <Cart 
         estaAbierto={mostrarCarrito} 

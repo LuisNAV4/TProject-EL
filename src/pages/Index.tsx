@@ -34,7 +34,7 @@ const Index = () => {
   const productosDestacados = sampleProducts.slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-color-primary">
       <Header
         cartItemCount={contadorArticulosCarrito}
         onCartClick={() => establecerCarritoAbierto(true)}
@@ -50,7 +50,7 @@ const Index = () => {
       />
       <CategorySection />
 
-      <div className="bg-gray-50">
+      <div>
         <ProductGrid
           products={sampleProducts.slice(4)}
           onAddToCart={agregarAlCarrito}

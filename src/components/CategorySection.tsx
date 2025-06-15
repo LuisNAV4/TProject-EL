@@ -43,7 +43,7 @@ const CategorySection = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section>
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent">

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Shield, Truck } from 'lucide-react';
@@ -18,16 +17,16 @@ const HeroSection = () => {
               </span>
               a tu alcance
             </h1>
-            <p className="text-xl mb-8 text-gray-200 leading-relaxed">
+            <p className="text-xl mb-8 leading-relaxed">
               Descubre los mejores productos tecnológicos, desde laptops y smartphones 
               hasta gadgets innovadores. Calidad garantizada y precios competitivos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="ColorBotonesHero hover:bg-gray-100 font-semibold">
+              <Button size="lg" className=" font-semibold">
                 Ver Productos
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" className="ColorBotonesHero font-semibold">
+              <Button size="lg" className=" font-semibold">
                 Ofertas del Día
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

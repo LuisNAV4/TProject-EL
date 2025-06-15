@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { usarCarrito } from '../contexts/CartContext';
 import { findProductBySlug } from '../utils/urlUtils';
+import { WhatsAppFloat } from '@/components/ui/whatsapp';
 import Cart from '../components/Cart';
 import Header from '../components/Header';
 
@@ -65,6 +66,9 @@ const ProductInfo = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <WhatsAppFloat />
+      
+      {/* Header */}
       <Header
         cartItemCount={contadorArticulosCarrito}
         onCartClick={() => establecerCarritoAbierto(true)}

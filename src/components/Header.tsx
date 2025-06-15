@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Configuración del logo - igual que en CatalogHeader
+const CONFIGURACION_LOGO = {
+  modo: 'text-only' as 'image-only' | 'text-only' | 'image-and-text', // Cambiar aquí: 'image-only' | 'text-only' | 'image-and-text'
+  rutaImagen: '/logo.png', // Ruta de la imagen del logo
+  texto: 'TechStore'
+};
+
 interface HeaderProps {
   cartItemCount: number;
   onCartClick: () => void;
@@ -19,16 +26,53 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
     'Wearables'
   ];
 
+  // Renderizado del logo igual que en CatalogHeader
+  const renderizarLogo = () => {
+    const clasesLogo = "select-none pointer-events-none";
+    switch (CONFIGURACION_LOGO.modo) {
+      case 'image-only':
+        return (
+          <img
+            src={CONFIGURACION_LOGO.rutaImagen}
+            alt="TechStore"
+            className={`h-8 w-auto ${clasesLogo}`}
+            draggable={false}
+          />
+        );
+      case 'text-only':
+        return (
+          <h1 className={`text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent ${clasesLogo}`}>
+            {CONFIGURACION_LOGO.texto}
+          </h1>
+        );
+      case 'image-and-text':
+        return (
+          <div className={`flex items-center space-x-3 ${clasesLogo}`}>
+            <img
+              src={CONFIGURACION_LOGO.rutaImagen}
+              alt="TechStore"
+              className="h-8 w-auto"
+              draggable={false}
+            />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent">
+              {CONFIGURACION_LOGO.texto}
+            </h1>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <header className="bg-[var(--color-bg)] shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4">
         {/* Top bar */}
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent"
-            onClick={() => window.location.href = '/'}>
-              TechStore
-            </h1>
+            <div onClick={() => window.location.href = '/'} className="cursor-pointer">
+              {renderizarLogo()}
+            </div>
           </div>
 
           {/* Search bar - desktop */}
@@ -91,7 +135,7 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
               <li key={category}>
                 <a
                   href="#"
-                  className="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors duration-200 block py-2 md:py-0"
+                  className="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors duration-200 block py-2 md:py-0 select-none"
                 >
                   {category}
                 </a>

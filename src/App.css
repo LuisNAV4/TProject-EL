@@ -6,7 +6,8 @@
   --color-bg: #ffffff;           /* Blanco para el fondo */
   --color-text: #1e293b; 
   --color-text-hero: #ffffff;
-  --color-botones-hero: #ffffff;        /* Color del texto */
+  --color-botones-hero: #133eff;  
+  --color-bg-primary: #d3d3d348;      /* Color del texto */
   --color-muted: #000000;
   --color-hero-primary: #1c74c7;
   --color-hero-secondary: #0c2f7a;  
@@ -18,14 +19,7 @@ body {
   color: var(--color-text);
 }
 
-.ColorBotonesHero{
- background: var(--color-botones-hero);
-  color: var(--color-primary);
-  hover {
-    background: var(--color-secondary);
-    color: var(--color-text-hero);
-  };
-};
+
 
 .ColorTextoBotonesHero{
   color: var();
@@ -33,6 +27,11 @@ body {
 
 .ColorTextoHero{
   color: var(--color-text-hero);
+}
+
+.bg-color-primary
+{
+  background-color: var(--color-bg-primary);
 }
 
 .logo {
