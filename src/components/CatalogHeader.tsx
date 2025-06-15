@@ -3,51 +3,51 @@ import React, { useState } from 'react';
 import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface CatalogHeaderProps {
-  cartItemCount: number;
-  onCartClick: () => void;
+interface PropiedadesCatalogHeader {
+  contadorArticulosCarrito: number;
+  alClicCarrito: () => void;
 }
 
 // Configuración del logo - aquí puedes cambiar entre las 3 opciones
-const LOGO_CONFIG = {
-  mode: 'text-only' as 'image-only' | 'text-only' | 'image-and-text', // Cambiar aquí: 'image-only' | 'text-only' | 'image-and-text'
-  imageSrc: '/logo.png', // Ruta de la imagen del logo
-  text: 'TechStore'
+const CONFIGURACION_LOGO = {
+  modo: 'text-only' as 'image-only' | 'text-only' | 'image-and-text', // Cambiar aquí: 'image-only' | 'text-only' | 'image-and-text'
+  rutaImagen: '/logo.png', // Ruta de la imagen del logo
+  texto: 'TechStore'
 };
 
-const CatalogHeader = ({ cartItemCount, onCartClick }: CatalogHeaderProps) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+const CatalogHeader = ({ contadorArticulosCarrito, alClicCarrito }: PropiedadesCatalogHeader) => {
+  const [menuAbierto, establecerMenuAbierto] = useState(false);
 
-  const renderLogo = () => {
-    const logoClasses = "select-none pointer-events-none"; // Hace que no se pueda seleccionar como texto
+  const renderizarLogo = () => {
+    const clasesLogo = "select-none pointer-events-none"; // Hace que no se pueda seleccionar como texto
     
-    switch (LOGO_CONFIG.mode) {
+    switch (CONFIGURACION_LOGO.modo) {
       case 'image-only':
         return (
           <img 
-            src={LOGO_CONFIG.imageSrc} 
+            src={CONFIGURACION_LOGO.rutaImagen} 
             alt="TechStore" 
-            className={`h-8 w-auto ${logoClasses}`}
+            className={`h-8 w-auto ${clasesLogo}`}
             draggable={false}
           />
         );
       case 'text-only':
         return (
-          <h1 className={`text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent ${logoClasses}`}>
-            {LOGO_CONFIG.text}
+          <h1 className={`text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent ${clasesLogo}`}>
+            {CONFIGURACION_LOGO.texto}
           </h1>
         );
       case 'image-and-text':
         return (
-          <div className={`flex items-center space-x-3 ${logoClasses}`}>
+          <div className={`flex items-center space-x-3 ${clasesLogo}`}>
             <img 
-              src={LOGO_CONFIG.imageSrc} 
+              src={CONFIGURACION_LOGO.rutaImagen} 
               alt="TechStore" 
               className="h-8 w-auto"
               draggable={false}
             />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent">
-              {LOGO_CONFIG.text}
+              {CONFIGURACION_LOGO.texto}
             </h1>
           </div>
         );
@@ -63,7 +63,7 @@ const CatalogHeader = ({ cartItemCount, onCartClick }: CatalogHeaderProps) => {
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-4">
             <div onClick={() => window.location.href = '/'} className="cursor-pointer">
-              {renderLogo()}
+              {renderizarLogo()}
             </div>
           </div>
 
@@ -88,29 +88,29 @@ const CatalogHeader = ({ cartItemCount, onCartClick }: CatalogHeaderProps) => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={onCartClick}
+              onClick={alClicCarrito}
               className="relative"
             >
               <ShoppingCart className="h-5 w-5 text-[var(--color-text)]" />
-              {cartItemCount > 0 && (
+              {contadorArticulosCarrito > 0 && (
                 <span className="absolute -top-2 -right-2 bg-[var(--color-danger)] text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
-                  {cartItemCount}
+                  {contadorArticulosCarrito}
                 </span>
               )}
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => establecerMenuAbierto(!menuAbierto)}
               className="md:hidden"
             >
-              {isMenuOpen ? <X className="h-5 w-5 text-[var(--color-text)]" /> : <Menu className="h-5 w-5 text-[var(--color-text)]" />}
+              {menuAbierto ? <X className="h-5 w-5 text-[var(--color-text)]" /> : <Menu className="h-5 w-5 text-[var(--color-text)]" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile menu */}
-        {isMenuOpen && (
+        {menuAbierto && (
           <div className="md:hidden pb-4">
             {/* Botón de Mi Cuenta en móvil */}
             <div className="flex justify-center mb-4">
@@ -137,3 +137,4 @@ const CatalogHeader = ({ cartItemCount, onCartClick }: CatalogHeaderProps) => {
 };
 
 export default CatalogHeader;
+

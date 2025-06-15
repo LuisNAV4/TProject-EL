@@ -4,22 +4,22 @@ import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Product } from './ProductCard';
 
-interface CartItem extends Product {
-  quantity: number;
+interface ArticuloCarrito extends Product {
+  cantidad: number;
 }
 
-interface CartProps {
-  isOpen: boolean;
-  onClose: () => void;
-  items: CartItem[];
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemoveItem: (id: number) => void;
+interface PropiedadesCarrito {
+  estaAbierto: boolean;
+  alCerrar: () => void;
+  articulos: ArticuloCarrito[];
+  alActualizarCantidad: (id: number, cantidad: number) => void;
+  alEliminarArticulo: (id: number) => void;
 }
 
-const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) => {
-  const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+const Cart = ({ estaAbierto, alCerrar, articulos, alActualizarCantidad, alEliminarArticulo }: PropiedadesCarrito) => {
+  const total = articulos.reduce((suma, articulo) => suma + (articulo.price * articulo.cantidad), 0);
 
-  if (!isOpen) return null;
+  if (!estaAbierto) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -29,46 +29,46 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartPr
             <ShoppingBag className="mr-2 h-6 w-6" />
             Carrito de Compras
           </h2>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={alCerrar}>
             <X className="h-6 w-6" />
           </Button>
         </div>
         
         <div className="overflow-y-auto max-h-96 p-6">
-          {items.length === 0 ? (
+          {articulos.length === 0 ? (
             <div className="text-center py-8">
               <ShoppingBag className="mx-auto h-16 w-16 text-gray-300 mb-4" />
               <p className="text-gray-500 text-lg">Tu carrito está vacío</p>
-              <Button onClick={onClose} className="mt-4">
+              <Button onClick={alCerrar} className="mt-4">
                 Continuar Comprando
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 border-b pb-4">
+              {articulos.map((articulo) => (
+                <div key={articulo.id} className="flex items-center space-x-4 border-b pb-4">
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={articulo.image}
+                    alt={articulo.name}
                     className="w-16 h-16 object-cover rounded"
                   />
                   <div className="flex-1">
-                    <h3 className="font-semibold">{item.name}</h3>
-                    <p className="text-gray-600">${item.price.toLocaleString()}</p>
+                    <h3 className="font-semibold">{articulo.name}</h3>
+                    <p className="text-gray-600">${articulo.price.toLocaleString()}</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
+                      onClick={() => alActualizarCantidad(articulo.id, Math.max(0, articulo.cantidad - 1))}
                     >
                       <Minus className="h-4 w-4" />
                     </Button>
-                    <span className="w-8 text-center">{item.quantity}</span>
+                    <span className="w-8 text-center">{articulo.cantidad}</span>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => alActualizarCantidad(articulo.id, articulo.cantidad + 1)}
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
@@ -76,7 +76,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartPr
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onRemoveItem(item.id)}
+                    onClick={() => alEliminarArticulo(articulo.id)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <X className="h-4 w-4" />
@@ -87,13 +87,13 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartPr
           )}
         </div>
         
-        {items.length > 0 && (
+        {articulos.length > 0 && (
           <div className="border-t p-6">
             <div className="flex justify-between items-center mb-4">
               <span className="text-xl font-bold">Total: REF {total.toLocaleString()}</span>
             </div>
             <div className="flex space-x-4">
-              <Button variant="outline" onClick={onClose} className="flex-1">
+              <Button variant="outline" onClick={alCerrar} className="flex-1">
                 Continuar Comprando
               </Button>
               <Button className="flex-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:from-[var(--color-primary)] hover:to-[var(--color-secondary)] hover:brightness-110">
@@ -108,3 +108,4 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartPr
 };
 
 export default Cart;
+

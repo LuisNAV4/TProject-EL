@@ -10,42 +10,42 @@ import Footer from "../components/Footer";
 import { sampleProducts } from "../data/products";
 import { Product } from "../components/ProductCard";
 import { WhatsAppFloat } from "@/components/ui/whatsapp";
-import { useCart } from "../contexts/CartContext";
+import { usarCarrito } from "../contexts/CartContext";
 import { productNameToSlug } from "../utils/urlUtils";
 
 const Index = () => {
   const navigate = useNavigate();
   const {
-    cartItems,
-    addToCart,
-    updateQuantity,
-    removeItem,
-    cartItemCount,
-    isCartOpen,
-    setIsCartOpen,
-  } = useCart();
+    articulosCarrito,
+    agregarAlCarrito,
+    actualizarCantidad,
+    eliminarArticulo,
+    contadorArticulosCarrito,
+    carritoAbierto,
+    establecerCarritoAbierto,
+  } = usarCarrito();
 
-  const handleProductClick = (product: Product) => {
-    const slug = productNameToSlug(product.name);
+  const manejarClicProducto = (producto: Product) => {
+    const slug = productNameToSlug(producto.name);
     navigate(`/product/${slug}`);
   };
 
   // Featured products (first 4 from sample)
-  const featuredProducts = sampleProducts.slice(0, 4);
+  const productosDestacados = sampleProducts.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-white">
       <Header
-        cartItemCount={cartItemCount}
-        onCartClick={() => setIsCartOpen(true)}
+        cartItemCount={contadorArticulosCarrito}
+        onCartClick={() => establecerCarritoAbierto(true)}
       />
       <WhatsAppFloat />
       <HeroSection />
 
       <ProductGrid
-        products={featuredProducts}
-        onAddToCart={addToCart}
-        onProductClick={handleProductClick}
+        products={productosDestacados}
+        onAddToCart={agregarAlCarrito}
+        onProductClick={manejarClicProducto}
         title="Productos Destacados"
       />
       <CategorySection />
@@ -53,17 +53,17 @@ const Index = () => {
       <div className="bg-gray-50">
         <ProductGrid
           products={sampleProducts.slice(4)}
-          onAddToCart={addToCart}
-          onProductClick={handleProductClick}
+          onAddToCart={agregarAlCarrito}
+          onProductClick={manejarClicProducto}
           title="Más Productos"
         />
       </div>
       <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeItem}
+        estaAbierto={carritoAbierto}
+        alCerrar={() => establecerCarritoAbierto(false)}
+        articulos={articulosCarrito}
+        alActualizarCantidad={actualizarCantidad}
+        alEliminarArticulo={eliminarArticulo}
       />
 
       <Footer />
@@ -72,3 +72,4 @@ const Index = () => {
 };
 
 export default Index;
+

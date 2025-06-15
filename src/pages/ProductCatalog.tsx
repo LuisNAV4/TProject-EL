@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
@@ -14,43 +15,43 @@ import { sampleProducts } from '../data/products';
 import { productNameToSlug } from '../utils/urlUtils';
 import CatalogHeader from '@/components/CatalogHeader';
 import Cart from '@/components/Cart';
-import { useCart } from '@/contexts/CartContext';
+import { usarCarrito } from '@/contexts/CartContext';
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
-  const { cartItems, addToCart, updateQuantity, removeItem, cartItemCount } = useCart();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 50000]);
-  const [sortBy, setSortBy] = useState('name');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showInStock, setShowInStock] = useState(false);
-  const [showCart, setShowCart] = useState(false);
+  const { articulosCarrito, agregarAlCarrito, actualizarCantidad, eliminarArticulo, contadorArticulosCarrito } = usarCarrito();
+  const [terminoBusqueda, establecerTerminoBusqueda] = useState('');
+  const [categoriasSeleccionadas, establecerCategoriasSeleccionadas] = useState<string[]>([]);
+  const [rangoPrecio, establecerRangoPrecio] = useState([0, 50000]);
+  const [ordenarPor, establecerOrdenarPor] = useState('name');
+  const [modoVista, establecerModoVista] = useState<'grid' | 'list'>('grid');
+  const [mostrarEnStock, establecerMostrarEnStock] = useState(false);
+  const [mostrarCarrito, establecerMostrarCarrito] = useState(false);
 
   // Get unique categories
-  const categories = useMemo(() => {
-    return Array.from(new Set(sampleProducts.map(product => product.category)));
+  const categorias = useMemo(() => {
+    return Array.from(new Set(sampleProducts.map(producto => producto.category)));
   }, []);
 
   // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let filtered = sampleProducts.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.description.toLowerCase().includes(searchTerm.toLowerCase());
+  const productosFiltrados = useMemo(() => {
+    let filtrados = sampleProducts.filter(producto => {
+      const coincideBusqueda = producto.name.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+                           producto.description.toLowerCase().includes(terminoBusqueda.toLowerCase());
       
-      const matchesCategory = selectedCategories.length === 0 || 
-                             selectedCategories.includes(product.category);
+      const coincideCategoria = categoriasSeleccionadas.length === 0 || 
+                             categoriasSeleccionadas.includes(producto.category);
       
-      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+      const coincidePrecio = producto.price >= rangoPrecio[0] && producto.price <= rangoPrecio[1];
       
-      const matchesStock = !showInStock || product.inStock;
+      const coincideStock = !mostrarEnStock || producto.inStock;
 
-      return matchesSearch && matchesCategory && matchesPrice && matchesStock;
+      return coincideBusqueda && coincideCategoria && coincidePrecio && coincideStock;
     });
 
     // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
+    filtrados.sort((a, b) => {
+      switch (ordenarPor) {
         case 'price-low':
           return a.price - b.price;
         case 'price-high':
@@ -63,41 +64,41 @@ const ProductCatalog = () => {
       }
     });
 
-    return filtered;
-  }, [searchTerm, selectedCategories, priceRange, sortBy, showInStock]);
+    return filtrados;
+  }, [terminoBusqueda, categoriasSeleccionadas, rangoPrecio, ordenarPor, mostrarEnStock]);
 
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories([...selectedCategories, category]);
+  const manejarCambioCategoria = (categoria: string, marcado: boolean) => {
+    if (marcado) {
+      establecerCategoriasSeleccionadas([...categoriasSeleccionadas, categoria]);
     } else {
-      setSelectedCategories(selectedCategories.filter(c => c !== category));
+      establecerCategoriasSeleccionadas(categoriasSeleccionadas.filter(c => c !== categoria));
     }
   };
 
-  const handleAddToCart = (product: Product) => {
-    addToCart(product);
-    console.log('Agregado al carrito:', product);
+  const manejarAgregarAlCarrito = (producto: Product) => {
+    agregarAlCarrito(producto);
+    console.log('Agregado al carrito:', producto);
   };
 
-  const handleProductClick = (product: Product) => {
-    const slug = productNameToSlug(product.name);
+  const manejarClicProducto = (producto: Product) => {
+    const slug = productNameToSlug(producto.name);
     navigate(`/catalogo/${slug}`);
   };
 
-  const FilterContent = () => (
+  const ContenidoFiltros = () => (
     <div className="space-y-6">
       {/* Categories */}
       <div>
         <h3 className="font-semibold mb-3">Categorías</h3>
         <div className="space-y-2">
-          {categories.map(category => (
-            <div key={category} className="flex items-center space-x-2">
+          {categorias.map(categoria => (
+            <div key={categoria} className="flex items-center space-x-2">
               <Checkbox
-                id={category}
-                checked={selectedCategories.includes(category)}
-                onCheckedChange={(checked) => handleCategoryChange(category, checked === true)}
+                id={categoria}
+                checked={categoriasSeleccionadas.includes(categoria)}
+                onCheckedChange={(marcado) => manejarCambioCategoria(categoria, marcado === true)}
               />
-              <label htmlFor={category} className="text-sm">{category}</label>
+              <label htmlFor={categoria} className="text-sm">{categoria}</label>
             </div>
           ))}
         </div>
@@ -108,16 +109,16 @@ const ProductCatalog = () => {
         <h3 className="font-semibold mb-3">Rango de Precio</h3>
         <div className="space-y-4">
           <Slider
-            value={priceRange}
-            onValueChange={setPriceRange}
+            value={rangoPrecio}
+            onValueChange={establecerRangoPrecio}
             max={50000}
             min={0}
             step={1000}
             className="w-full"
           />
           <div className="flex justify-between text-sm text-gray-600">
-            <span>REF: {priceRange[0].toLocaleString()}</span>
-            <span>REF: {priceRange[1].toLocaleString()}</span>
+            <span>REF: {rangoPrecio[0].toLocaleString()}</span>
+            <span>REF: {rangoPrecio[1].toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -126,8 +127,8 @@ const ProductCatalog = () => {
       <div className="flex items-center space-x-2">
         <Checkbox
           id="inStock"
-          checked={showInStock}
-          onCheckedChange={(checked) => setShowInStock(checked === true)}
+          checked={mostrarEnStock}
+          onCheckedChange={(marcado) => establecerMostrarEnStock(marcado === true)}
         />
         <label htmlFor="inStock" className="text-sm">Solo productos en stock</label>
       </div>
@@ -136,13 +137,13 @@ const ProductCatalog = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <CatalogHeader cartItemCount={cartItemCount} onCartClick={() => setShowCart(true)} />
+      <CatalogHeader contadorArticulosCarrito={contadorArticulosCarrito} alClicCarrito={() => establecerMostrarCarrito(true)} />
       <Cart 
-        isOpen={showCart} 
-        onClose={() => setShowCart(false)}
-        items={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeItem}
+        estaAbierto={mostrarCarrito} 
+        alCerrar={() => establecerMostrarCarrito(false)}
+        articulos={articulosCarrito}
+        alActualizarCantidad={actualizarCantidad}
+        alEliminarArticulo={eliminarArticulo}
       />
       
       {/* Search and filters header */}
@@ -158,8 +159,8 @@ const ProductCatalog = () => {
                 <Input
                   type="text"
                   placeholder="Buscar productos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={terminoBusqueda}
+                  onChange={(e) => establecerTerminoBusqueda(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -168,7 +169,7 @@ const ProductCatalog = () => {
             {/* Controls */}
             <div className="flex items-center gap-2">
               {/* Sort */}
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select value={ordenarPor} onValueChange={establecerOrdenarPor}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Ordenar por" />
                 </SelectTrigger>
@@ -183,16 +184,16 @@ const ProductCatalog = () => {
               {/* View Mode */}
               <div className="flex border rounded-lg">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant={modoVista === 'grid' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => establecerModoVista('grid')}
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant={modoVista === 'list' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => establecerModoVista('list')}
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -210,7 +211,7 @@ const ProductCatalog = () => {
                     <SheetTitle>Filtros</SheetTitle>
                   </SheetHeader>
                   <div className="mt-6">
-                    <FilterContent />
+                    <ContenidoFiltros />
                   </div>
                 </SheetContent>
               </Sheet>
@@ -229,7 +230,7 @@ const ProductCatalog = () => {
                   <Filter className="h-4 w-4" />
                   <h2 className="font-semibold">Filtros</h2>
                 </div>
-                <FilterContent />
+                <ContenidoFiltros />
               </CardContent>
             </Card>
           </div>
@@ -238,14 +239,14 @@ const ProductCatalog = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <p className="text-gray-600">
-                {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+                {productosFiltrados.length} producto{productosFiltrados.length !== 1 ? 's' : ''} encontrado{productosFiltrados.length !== 1 ? 's' : ''}
               </p>
               <div className="flex gap-2">
-                {selectedCategories.map(category => (
-                  <Badge key={category} variant="secondary" className="cursor-pointer">
-                    {category}
+                {categoriasSeleccionadas.map(categoria => (
+                  <Badge key={categoria} variant="secondary" className="cursor-pointer">
+                    {categoria}
                     <button
-                      onClick={() => handleCategoryChange(category, false)}
+                      onClick={() => manejarCambioCategoria(categoria, false)}
                       className="ml-1 hover:text-red-500"
                     >
                       ×
@@ -255,15 +256,15 @@ const ProductCatalog = () => {
               </div>
             </div>
 
-            {filteredProducts.length === 0 ? (
+            {productosFiltrados.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">No se encontraron productos</p>
                 <Button
                   onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategories([]);
-                    setPriceRange([0, 50000]);
-                    setShowInStock(false);
+                    establecerTerminoBusqueda('');
+                    establecerCategoriasSeleccionadas([]);
+                    establecerRangoPrecio([0, 50000]);
+                    establecerMostrarEnStock(false);
                   }}
                   className="mt-4"
                 >
@@ -272,16 +273,16 @@ const ProductCatalog = () => {
               </div>
             ) : (
               <div className={
-                viewMode === 'grid'
+                modoVista === 'grid'
                   ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
                   : 'space-y-4'
               }>
-                {filteredProducts.map(product => (
+                {productosFiltrados.map(producto => (
                   <ProductCard
-                    key={product.id}
-                    product={product}
-                    onAddToCart={handleAddToCart}
-                    onProductClick={handleProductClick}
+                    key={producto.id}
+                    product={producto}
+                    onAddToCart={manejarAgregarAlCarrito}
+                    onProductClick={manejarClicProducto}
                   />
                 ))}
               </div>
@@ -294,3 +295,4 @@ const ProductCatalog = () => {
 };
 
 export default ProductCatalog;
+
