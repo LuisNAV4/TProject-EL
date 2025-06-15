@@ -12,16 +12,20 @@ import { Slider } from '@/components/ui/slider';
 import ProductCard, { Product } from '../components/ProductCard';
 import { sampleProducts } from '../data/products';
 import { productNameToSlug } from '../utils/urlUtils';
-import Header from '@/components/Header';
+import CatalogHeader from '@/components/CatalogHeader';
+import Cart from '@/components/Cart';
+import { useCart } from '@/contexts/CartContext';
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
+  const { items, addItem } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showInStock, setShowInStock] = useState(false);
+  const [showCart, setShowCart] = useState(false);
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -71,6 +75,7 @@ const ProductCatalog = () => {
   };
 
   const handleAddToCart = (product: Product) => {
+    addItem(product);
     console.log('Agregado al carrito:', product);
   };
 
@@ -131,8 +136,10 @@ const ProductCatalog = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header cartItemCount={0} onCartClick={() => { /* TODO: handle cart click */ }} />
-      {/* Header anterior de catálogo, permanece para filtros y búsqueda */}
+      <CatalogHeader cartItemCount={items.length} onCartClick={() => setShowCart(true)} />
+      {showCart && <Cart isOpen={showCart} onClose={() => setShowCart(false)} />}
+      
+      {/* Search and filters header */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center gap-4">

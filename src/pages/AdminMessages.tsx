@@ -248,11 +248,11 @@ const AdminMessages: React.FC = () => {
               )}
             </button>
           )}
-          <div>
-            <div className="font-bold text-base md:text-lg text-white">
+          <div className="flex-1">
+            <div className="font-bold text-base md:text-lg text-white text-left">
               {selectedChat ? selectedChat.user : "Selecciona un chat"}
             </div>
-            <div className="text-xs md:text-sm text-white">Usuario</div>
+            <div className="text-xs md:text-sm text-white text-left">Usuario</div>
           </div>
         </div>
 
