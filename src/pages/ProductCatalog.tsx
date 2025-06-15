@@ -18,7 +18,7 @@ import { useCart } from '@/contexts/CartContext';
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
-  const { items, addItem } = useCart();
+  const { cartItems, addToCart, updateQuantity, removeItem, cartItemCount } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 50000]);
@@ -75,7 +75,7 @@ const ProductCatalog = () => {
   };
 
   const handleAddToCart = (product: Product) => {
-    addItem(product);
+    addToCart(product);
     console.log('Agregado al carrito:', product);
   };
 
@@ -136,8 +136,14 @@ const ProductCatalog = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <CatalogHeader cartItemCount={items.length} onCartClick={() => setShowCart(true)} />
-      {showCart && <Cart isOpen={showCart} onClose={() => setShowCart(false)} />}
+      <CatalogHeader cartItemCount={cartItemCount} onCartClick={() => setShowCart(true)} />
+      <Cart 
+        isOpen={showCart} 
+        onClose={() => setShowCart(false)}
+        items={cartItems}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeItem}
+      />
       
       {/* Search and filters header */}
       <div className="bg-white shadow-sm">
