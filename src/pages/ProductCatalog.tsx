@@ -12,6 +12,7 @@ import { Slider } from '@/components/ui/slider';
 import ProductCard, { Product } from '../components/ProductCard';
 import { sampleProducts } from '../data/products';
 import { productNameToSlug } from '../utils/urlUtils';
+import Header from '@/components/Header';
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
@@ -70,12 +71,12 @@ const ProductCatalog = () => {
   };
 
   const handleAddToCart = (product: Product) => {
-    console.log('Added to cart:', product);
+    console.log('Agregado al carrito:', product);
   };
 
   const handleProductClick = (product: Product) => {
     const slug = productNameToSlug(product.name);
-    navigate(`/product/${slug}`);
+    navigate(`/catalogo/${slug}`);
   };
 
   const FilterContent = () => (
@@ -130,7 +131,8 @@ const ProductCatalog = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      <Header cartItemCount={0} onCartClick={() => { /* TODO: handle cart click */ }} />
+      {/* Header anterior de catálogo, permanece para filtros y búsqueda */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center gap-4">

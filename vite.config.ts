@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
-  base: "https://luisnav4.github.io/TProject-EL",
+  //base: "https://luisnav4.github.io/TProject-EL",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

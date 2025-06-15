@@ -10,10 +10,10 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-black opacity-20"></div>
       <div className="relative container mx-auto px-4 py-20">
         <div className="flex flex-col lg:flex-row items-center">
-          <div className="lg:w-1/2 mb-10 lg:mb-0">
+          <div className="lg:w-1/2 mb-10 lg:mb-0 ColorTextoHero">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
               Tecnología de
-              <span className="block bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent brightness-100">
+              <span className="block ">
                 Última Generación
               </span>
               a tu alcance
@@ -23,11 +23,11 @@ const HeroSection = () => {
               hasta gadgets innovadores. Calidad garantizada y precios competitivos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold">
+              <Button size="lg" className="ColorBotonesHero hover:bg-gray-100 font-semibold">
                 Ver Productos
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" className="bg-white text-blue-900 hover:bg-gray-100 font-semibold">
+              <Button size="lg" className="ColorBotonesHero font-semibold">
                 Ofertas del Día
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

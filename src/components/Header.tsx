@@ -25,7 +25,8 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
         {/* Top bar */}
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent"
+            onClick={() => window.location.href = '/'}>
               TechStore
             </h1>
           </div>
