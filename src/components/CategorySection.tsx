@@ -60,15 +60,15 @@ const CategorySection = () => {
             return (
               <div
                 key={index}
-                className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group"
+                className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group hover:text-[var(--color-primary)] text-[var(--color-text)]"
               >
                 <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${category.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold mb-2">
                   {category.title}
                 </h3>
-                <p className="text-gray-600">
+                <p className="">
                   {category.description}
                 </p>
               </div>
