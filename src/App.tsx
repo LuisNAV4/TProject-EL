@@ -11,6 +11,7 @@ import AdminMessages from "./pages/AdminMessages";
 import ProductInfo from "./pages/ProductInfo";
 import ProductCatalog from "./pages/ProductCatalog";
 import Checkout from "./pages/Checkout";
+import PaymentConfirmation from "./pages/PaymentConfirmation";
 import ProductTracking from "./pages/ProductTracking";
 import TicketSupport from "./pages/TicketSupport";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/products" element={<ProductCatalog />} />
             <Route path="/product/:slug" element={<ProductInfo />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
             <Route path="/tracking" element={<ProductTracking />} />
             <Route path="/tickets" element={<TicketSupport />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

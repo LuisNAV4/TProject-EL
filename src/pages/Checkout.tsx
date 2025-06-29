@@ -15,8 +15,10 @@ const Checkout = () => {
 
   const manejarProcesarPago = () => {
     if (metodoSeleccionado === 'transferencia' || metodoSeleccionado === 'pago-movil') {
-      // Redirigir a la página de tracking
-      navigate('/tracking');
+      // Redirigir a la página de confirmación de pago
+      navigate('/payment-confirmation', {
+        state: { metodoSeleccionado }
+      });
     } else {
       // Para PayPal y Stripe se puede implementar la lógica correspondiente
       alert(`Procesando pago con ${metodoSeleccionado}`);
