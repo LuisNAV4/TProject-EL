@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Product } from './ProductCard';
@@ -17,7 +18,13 @@ interface PropiedadesCarrito {
 }
 
 const Cart = ({ estaAbierto, alCerrar, articulos, alActualizarCantidad, alEliminarArticulo }: PropiedadesCarrito) => {
+  const navigate = useNavigate();
   const total = articulos.reduce((suma, articulo) => suma + (articulo.price * articulo.cantidad), 0);
+
+  const irAlCheckout = () => {
+    alCerrar();
+    navigate('/checkout');
+  };
 
   if (!estaAbierto) return null;
 
@@ -96,8 +103,11 @@ const Cart = ({ estaAbierto, alCerrar, articulos, alActualizarCantidad, alElimin
               <Button variant="outline" onClick={alCerrar} className="flex-1">
                 Continuar Comprando
               </Button>
-              <Button className="flex-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:from-[var(--color-primary)] hover:to-[var(--color-secondary)] hover:brightness-110">
-                Proceder al Pago
+              <Button 
+                onClick={irAlCheckout}
+                className="flex-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:from-[var(--color-primary)] hover:to-[var(--color-secondary)] hover:brightness-110"
+              >
+                Ir a Checkout
               </Button>
             </div>
           </div>
@@ -108,4 +118,3 @@ const Cart = ({ estaAbierto, alCerrar, articulos, alActualizarCantidad, alElimin
 };
 
 export default Cart;
-
