@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { usarCarrito } from '../contexts/CartContext';
-import { findProductBySlug } from '../utils/urlUtils';
+import { ProductAPI } from '../services/api';
+import { Product } from '../components/ProductCard';
 import { WhatsAppFloat } from '@/components/ui/whatsapp';
 import Cart from '../components/Cart';
 import Header from '../components/Header';
@@ -16,6 +17,9 @@ const ProductInfo = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const [producto, setProducto] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [cantidad, establecerCantidad] = useState(1);
   const [esFavorito, establecerEsFavorito] = useState(false);
   
@@ -29,7 +33,35 @@ const ProductInfo = () => {
     establecerCarritoAbierto,
   } = usarCarrito();
 
-  const producto = findProductBySlug(slug || '');
+  // Load product data
+  useEffect(() => {
+    const loadProduct = async () => {
+      if (!slug) return;
+      
+      setLoading(true);
+      try {
+        const productData = await ProductAPI.getProductBySlug(slug);
+        setProducto(productData || null);
+      } catch (error) {
+        console.error('Error loading product:', error);
+        setProducto(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Cargando producto...</h1>
+        </div>
+      </div>
+    );
+  }
 
   if (!producto) {
     return (

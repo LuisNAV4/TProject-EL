@@ -1,6 +1,6 @@
 
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import ProductCard, { Product } from '../components/ProductCard';
-import { sampleProducts } from '../data/products';
+import { ProductAPI } from '../services/api';
 import { productNameToSlug } from '../utils/urlUtils';
 import CatalogHeader from '@/components/CatalogHeader';
 import Cart from '@/components/Cart';
@@ -20,7 +20,13 @@ import { WhatsAppFloat } from '@/components/ui/whatsapp';
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { articulosCarrito, agregarAlCarrito, actualizarCantidad, eliminarArticulo, contadorArticulosCarrito } = usarCarrito();
+  
+  const [productos, setProductos] = useState<Product[]>([]);
+  const [categorias, setCategorias] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const [terminoBusqueda, establecerTerminoBusqueda] = useState('');
   const [categoriasSeleccionadas, establecerCategoriasSeleccionadas] = useState<string[]>([]);
   const [rangoPrecio, establecerRangoPrecio] = useState([0, 50000]);
@@ -28,15 +34,50 @@ const ProductCatalog = () => {
   const [modoVista, establecerModoVista] = useState<'grid' | 'list'>('grid');
   const [mostrarEnStock, establecerMostrarEnStock] = useState(false);
   const [mostrarCarrito, establecerMostrarCarrito] = useState(false);
+  const [mostrarOferta, setMostrarOferta] = useState(false);
 
-  // Get unique categories
-  const categorias = useMemo(() => {
-    return Array.from(new Set(sampleProducts.map(producto => producto.category)));
+  // Load products and categories on mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [productosData, categoriasData] = await Promise.all([
+          ProductAPI.getProducts(),
+          ProductAPI.getCategories()
+        ]);
+        setProductos(productosData);
+        setCategorias(categoriasData);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
+
+  // Handle route state (filters from navigation)
+  useEffect(() => {
+    if (location.state) {
+      const { selectedCategories, onSale } = location.state;
+      
+      if (selectedCategories) {
+        establecerCategoriasSeleccionadas(selectedCategories);
+      }
+      
+      if (onSale) {
+        setMostrarOferta(true);
+      }
+      
+      // Clear location state after processing
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate]);
 
   // Filter and sort products
   const productosFiltrados = useMemo(() => {
-    let filtrados = sampleProducts.filter(producto => {
+    let filtrados = productos.filter(producto => {
       const coincideBusqueda = producto.name.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
                            producto.description.toLowerCase().includes(terminoBusqueda.toLowerCase());
       
@@ -46,8 +87,10 @@ const ProductCatalog = () => {
       const coincidePrecio = producto.price >= rangoPrecio[0] && producto.price <= rangoPrecio[1];
       
       const coincideStock = !mostrarEnStock || producto.inStock;
+      
+      const coincideOferta = !mostrarOferta || (producto.originalPrice && producto.originalPrice > producto.price);
 
-      return coincideBusqueda && coincideCategoria && coincidePrecio && coincideStock;
+      return coincideBusqueda && coincideCategoria && coincidePrecio && coincideStock && coincideOferta;
     });
 
     // Sort products
@@ -66,7 +109,7 @@ const ProductCatalog = () => {
     });
 
     return filtrados;
-  }, [terminoBusqueda, categoriasSeleccionadas, rangoPrecio, ordenarPor, mostrarEnStock]);
+  }, [productos, terminoBusqueda, categoriasSeleccionadas, rangoPrecio, ordenarPor, mostrarEnStock, mostrarOferta]);
 
   const manejarCambioCategoria = (categoria: string, marcado: boolean) => {
     if (marcado) {
@@ -132,6 +175,16 @@ const ProductCatalog = () => {
           onCheckedChange={(marcado) => establecerMostrarEnStock(marcado === true)}
         />
         <label htmlFor="inStock" className="text-sm">Solo productos en stock</label>
+      </div>
+
+      {/* Offers Filter */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="onSale"
+          checked={mostrarOferta}
+          onCheckedChange={(marcado) => setMostrarOferta(marcado === true)}
+        />
+        <label htmlFor="onSale" className="text-sm">Solo ofertas</label>
       </div>
     </div>
   );
@@ -242,8 +295,8 @@ const ProductCatalog = () => {
           {/* Products */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
-              <p className="text-gray-600">
-                {productosFiltrados.length} producto{productosFiltrados.length !== 1 ? 's' : ''} encontrado{productosFiltrados.length !== 1 ? 's' : ''}
+                <p className="text-gray-600">
+                {loading ? 'Cargando...' : `${productosFiltrados.length} producto${productosFiltrados.length !== 1 ? 's' : ''} encontrado${productosFiltrados.length !== 1 ? 's' : ''}`}
               </p>
               <div className="flex gap-2">
                 {categoriasSeleccionadas.map(categoria => (
@@ -269,6 +322,7 @@ const ProductCatalog = () => {
                     establecerCategoriasSeleccionadas([]);
                     establecerRangoPrecio([0, 50000]);
                     establecerMostrarEnStock(false);
+                    setMostrarOferta(false);
                   }}
                   className="mt-4"
                 >

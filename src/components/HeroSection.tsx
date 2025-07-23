@@ -1,9 +1,20 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Shield, Truck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Portada from '@/images/IntroImagen.webp'
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleVerProductos = () => {
+    navigate('/products');
+  };
+
+  const handleOfertasDelDia = () => {
+    navigate('/products', { state: { onSale: true } });
+  };
+
   return (
     <section className="relative bg-gradient-to-br from-[var(--color-hero-primary)] via-[var(--color-hero-secondary)] to-[var(--color-hero-tertiary)] text-white overflow-hidden">
       <div className="absolute inset-0 bg-black opacity-20"></div>
@@ -22,11 +33,11 @@ const HeroSection = () => {
               hasta gadgets innovadores. Calidad garantizada y precios competitivos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className=" font-semibold">
+              <Button size="lg" className=" font-semibold" onClick={handleVerProductos}>
                 Ver Productos
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" className=" font-semibold">
+              <Button size="lg" className=" font-semibold" onClick={handleOfertasDelDia}>
                 Ofertas del Día
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

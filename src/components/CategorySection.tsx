@@ -1,8 +1,15 @@
 
 import React from 'react';
 import { Smartphone, Laptop, Headphones, Camera, Watch, Gamepad2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CategorySection = () => {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryTitle: string) => {
+    navigate('/products', { state: { selectedCategories: [categoryTitle] } });
+  };
+
   const categories = [
     {
       icon: Smartphone,
@@ -60,6 +67,7 @@ const CategorySection = () => {
             return (
               <div
                 key={index}
+                onClick={() => handleCategoryClick(category.title)}
                 className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group hover:text-[var(--color-primary)] text-[var(--color-text)]"
               >
                 <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${category.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>

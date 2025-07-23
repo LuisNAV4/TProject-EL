@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 // Configuración del logo - igual que en CatalogHeader
 const CONFIGURACION_LOGO = {
@@ -16,6 +17,7 @@ interface HeaderProps {
 
 const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const categories = [
     'Smartphones',
@@ -25,6 +27,11 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
     'Fotografía',
     'Wearables'
   ];
+
+  const handleCategoryClick = (category: string) => {
+    navigate('/products', { state: { selectedCategories: [category] } });
+    setIsMenuOpen(false);
+  };
 
   // Renderizado del logo igual que en CatalogHeader
   const renderizarLogo = () => {
@@ -133,12 +140,12 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
             )}
             {categories.map((category) => (
               <li key={category}>
-                <a
-                  href="#"
-                  className="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors duration-200 block py-2 md:py-0 select-none"
+                <button
+                  onClick={() => handleCategoryClick(category)}
+                  className="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors duration-200 block py-2 md:py-0 select-none cursor-pointer"
                 >
                   {category}
-                </a>
+                </button>
               </li>
             ))}
           </ul>
