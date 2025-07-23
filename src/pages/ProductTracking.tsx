@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Header from '../components/Header';
 import { usarCarrito } from '../contexts/CartContext';
+import { WhatsAppFloat } from "@/components/ui/whatsapp";
 
 const ProductTracking = () => {
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ const ProductTracking = () => {
 
   return (
     <div className="min-h-screen bg-color-primary">
+      <WhatsAppFloat />
       <Header
         cartItemCount={contadorArticulosCarrito}
         onCartClick={() => establecerCarritoAbierto(true)}

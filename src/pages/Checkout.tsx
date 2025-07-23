@@ -5,6 +5,7 @@ import { usarCarrito } from '../contexts/CartContext';
 import { CreditCard, Smartphone, Building2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
+import { WhatsAppFloat } from "@/components/ui/whatsapp";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-color-primary">
+      <WhatsAppFloat />
       <Header
         cartItemCount={contadorArticulosCarrito}
         onCartClick={() => establecerCarritoAbierto(true)}

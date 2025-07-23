@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Header from '../components/Header';
 import { usarCarrito } from '../contexts/CartContext';
+import { WhatsAppFloat } from "@/components/ui/whatsapp";
 
 const PaymentConfirmation = () => {
   const navigate = useNavigate();
@@ -71,6 +72,7 @@ const PaymentConfirmation = () => {
 
   return (
     <div className="min-h-screen bg-color-primary">
+      <WhatsAppFloat />
       <Header
         cartItemCount={contadorArticulosCarrito}
         onCartClick={() => establecerCarritoAbierto(true)}
