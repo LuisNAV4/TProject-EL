@@ -57,7 +57,7 @@ export const WhatsAppFloat = () => {
       id: USER_ID,
       user: "Luis Navarro",
       text: input,
-      timestamp: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+      timestamp: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
     };
     // Emitir el mensaje al servidor
     socket.emit("nuevoMensaje", msg);
