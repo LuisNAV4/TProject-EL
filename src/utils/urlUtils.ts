@@ -22,7 +22,7 @@ export const slugToProductName = (slug: string): string => {
 // Encuentra un producto por su slug
 export const findProductBySlug = (slug: string) => {
   return sampleProducts.find(product => 
-    productNameToSlug(product.name) === slug
+    productNameToSlug(product.nombre) === slug
   );
 };
 

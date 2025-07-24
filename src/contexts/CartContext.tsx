@@ -97,12 +97,12 @@ export const ProveedorCarrito = ({ children }: { children: ReactNode }) => {
             // Map database fields to Product interface
             return {
               id: producto.id,
-              name: producto.nombre,
-              price: producto.precio,
-              originalPrice: producto.precio_original,
-              image: producto.imagen_url,
-              rating: producto.calificacion || 0,
-              category: producto.categoria_id?.toString() || '',
+              nombre: producto.nombre,
+              precio: producto.precio,
+              precio_original: producto.precio_original,
+              imagen_url: producto.imagen_url,
+              calificacion: producto.calificacion || 0,
+              categoria_id: producto.categoria_id?.toString() || '',
               cantidad: item.cantidad
             } as ArticuloCarrito;
           }
