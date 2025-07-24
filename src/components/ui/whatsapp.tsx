@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
 import WhatsappLogo from "@/images/whatsapp-logo.svg";
 import { io } from "socket.io-client";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 // Solo una instancia de socket
 const socket = io("http://localhost:3000");
@@ -12,7 +14,38 @@ export const WhatsAppFloat = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
+  const [userProfile, setUserProfile] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const { user } = useAuth();
+
+  // Obtener perfil del usuario autenticado
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        setUserProfile(data);
+      }
+    };
+
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  // Función para obtener el nombre a mostrar
+  const getUserDisplayName = () => {
+    if (user && userProfile) {
+      return userProfile.nombre_completo || userProfile.nombre_usuario || user.email;
+    }
+    if (user) {
+      return user.email;
+    }
+    return `Usuario-${USER_ID.slice(-6)}`; // Últimos 6 dígitos del UUID para usuarios no registrados
+  };
 
   // Recibir mensajes en tiempo real
   useEffect(() => {
@@ -40,6 +73,7 @@ export const WhatsAppFloat = () => {
       )
     );
   }, [messages, open]);
+  
   useEffect(() => {
     const storedMessages = localStorage.getItem("whatsapp-messages");
     if (storedMessages) {
@@ -47,15 +81,14 @@ export const WhatsAppFloat = () => {
     }
   }, []);
 
-
   const handleSend = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!input.trim()) return;
     const now = new Date();
     const msg = {
       from: "user",
-      id: USER_ID,
-      user: "Luis Navarro",
+      id: user?.id || USER_ID,
+      user: getUserDisplayName(),
       text: input,
       timestamp: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
     };
@@ -169,7 +202,13 @@ export const WhatsAppFloat = () => {
                   wordBreak: "break-word",
                 }}
               >
+                <div style={{ marginBottom: "4px", fontSize: "13px", opacity: 0.8 }}>
+                  {msg.user || getUserDisplayName()}
+                </div>
                 {msg.text}
+                <div style={{ fontSize: "11px", opacity: 0.7, marginTop: "4px" }}>
+                  {msg.timestamp}
+                </div>
               </div>
             ))}
             <div ref={messagesEndRef} />

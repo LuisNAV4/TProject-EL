@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import AuthDropdown from './auth/AuthDropdown';
 import { useNavigate } from 'react-router-dom';
 
 // Configuración del logo - igual que en CatalogHeader
@@ -96,10 +97,7 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
 
           {/* Right section */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="hidden md:flex text-[var(--color-text)]">
-              <User className="h-5 w-5 mr-2" />
-              Mi Cuenta
-            </Button>
+            <AuthDropdown />
             <Button
               variant="ghost"
               size="sm"
@@ -130,12 +128,7 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
             {/* Botón central solo visible en mobile */}
             {isMenuOpen && (
               <li className="md:hidden flex justify-center mb-2">
-                <button
-                  className="w-full flex items-center justify-center bg-[var(--color-primary)] text-white font-semibold rounded-lg py-2 transition-colors duration-200"
-                >
-                  <User className="h-5 w-5 mr-2" />
-                  Iniciar sesión
-                </button>
+                <AuthDropdown />
               </li>
             )}
             {categories.map((category) => (
