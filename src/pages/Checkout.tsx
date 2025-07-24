@@ -12,7 +12,7 @@ const Checkout = () => {
   const { articulosCarrito, contadorArticulosCarrito, establecerCarritoAbierto } = usarCarrito();
   const [metodoSeleccionado, establecerMetodoSeleccionado] = useState('');
 
-  const total = articulosCarrito.reduce((suma, articulo) => suma + (articulo.price * articulo.cantidad), 0);
+  const total = articulosCarrito.reduce((suma, articulo) => suma + (articulo.precio * articulo.cantidad), 0);
 
   const manejarProcesarPago = () => {
     if (metodoSeleccionado === 'transferencia' || metodoSeleccionado === 'pago-movil') {
@@ -86,19 +86,19 @@ const Checkout = () => {
                 {articulosCarrito.map((articulo) => (
                   <div key={articulo.id} className="flex items-center space-x-4 border-b pb-4">
                     <img
-                      src={articulo.image}
-                      alt={articulo.name}
+                      src={articulo.imagen_url}
+                      alt={articulo.nombre}
                       className="w-16 h-16 object-cover rounded"
                     />
                     <div className="flex-1">
-                      <h3 className="font-semibold">{articulo.name}</h3>
+                      <h3 className="font-semibold">{articulo.nombre}</h3>
                       <p className="text-gray-600">
-                        ${articulo.price.toLocaleString()} x {articulo.cantidad}
+                        ${articulo.precio.toLocaleString()} x {articulo.cantidad}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">
-                        ${(articulo.price * articulo.cantidad).toLocaleString()}
+                        ${(articulo.precio * articulo.cantidad).toLocaleString()}
                       </p>
                     </div>
                   </div>

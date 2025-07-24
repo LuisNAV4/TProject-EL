@@ -45,7 +45,7 @@ const Index = () => {
   }, []);
 
   const manejarClicProducto = (producto: Product) => {
-    const slug = productNameToSlug(producto.name);
+    const slug = productNameToSlug(producto.nombre);
     navigate(`/product/${slug}`);
   };
 

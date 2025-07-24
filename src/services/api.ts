@@ -4,14 +4,14 @@ import { sampleProducts } from '../data/products';
 
 // Por ahora usamos datos locales, pero esta estructura permite fácil migración a API externa
 export class ProductAPI {
-  private static baseUrl = process.env.VITE_API_URL || '';
+   private static baseUrl = import.meta.env.VITE_API_URL || '';
 
   // Obtener todos los productos
   static async getProducts(): Promise<Product[]> {
     try {
       // TODO: Reemplazar con llamada real a API externa
-      // const response = await fetch(`${this.baseUrl}/api/products`);
-      // return response.json();
+      //  const response = await fetch(`${this.baseUrl}/api/productos`);
+      //  return response.json();
       
       // Por ahora retornamos datos de muestra
       return Promise.resolve(sampleProducts);
@@ -30,7 +30,7 @@ export class ProductAPI {
       
       const products = await this.getProducts();
       return products.find(product => 
-        this.nameToSlug(product.name) === slug
+        this.nombreToSlug(product.nombre) === slug
       );
     } catch (error) {
       console.error('Error al obtener producto por slug:', error);
@@ -42,11 +42,11 @@ export class ProductAPI {
   static async getCategories(): Promise<string[]> {
     try {
       // TODO: Reemplazar con llamada real a API externa
-      // const response = await fetch(`${this.baseUrl}/api/categories`);
+      // const response = await fetch(`${this.baseUrl}/api/categorias`);
       // return response.json();
       
       const products = await this.getProducts();
-      const categories = [...new Set(products.map(p => p.category))];
+      const categories = [...new Set(products.map(p => p.categoria_id))].filter(Boolean);
       return categories;
     } catch (error) {
       console.error('Error al obtener categorías:', error);
@@ -58,10 +58,10 @@ export class ProductAPI {
   static async getFilteredProducts(filters: {
     search?: string;
     categories?: string[];
-    priceRange?: [number, number];
+    precioRange?: [number, number];
     onSale?: boolean;
-    inStock?: boolean;
-    sortBy?: 'name' | 'price' | 'rating';
+    en_stock?: boolean;
+    sortBy?: 'nombre' | 'precio' | 'calificacion';
     sortOrder?: 'asc' | 'desc';
   }): Promise<Product[]> {
     try {
@@ -72,31 +72,31 @@ export class ProductAPI {
         if (filters.search) {
           const searchTerm = filters.search.toLowerCase();
           const matchesSearch = 
-            product.name.toLowerCase().includes(searchTerm) ||
-            product.description.toLowerCase().includes(searchTerm) ||
-            product.category.toLowerCase().includes(searchTerm);
+            product.nombre.toLowerCase().includes(searchTerm) ||
+            product.descripcion.toLowerCase().includes(searchTerm) ||
+            product.categoria_id.toLowerCase().includes(searchTerm);
           if (!matchesSearch) return false;
         }
 
         // Filtro de categorías
         if (filters.categories && filters.categories.length > 0) {
-          if (!filters.categories.includes(product.category)) return false;
+          if (!filters.categories.includes(product.categoria_id)) return false;
         }
 
         // Filtro de rango de precio
-        if (filters.priceRange) {
-          const [min, max] = filters.priceRange;
-          if (product.price < min || product.price > max) return false;
+        if (filters.precioRange) {
+          const [min, max] = filters.precioRange;
+          if (product.precio < min || product.precio > max) return false;
         }
 
         // Filtro de ofertas
         if (filters.onSale) {
-          if (!product.originalPrice) return false;
+          if (!product.precio_original) return false;
         }
 
         // Filtro de stock
-        if (filters.inStock !== undefined) {
-          if (product.inStock !== filters.inStock) return false;
+        if (filters.en_stock !== undefined) {
+          if (product.en_stock !== filters.en_stock) return false;
         }
 
         return true;
@@ -105,17 +105,17 @@ export class ProductAPI {
         
         let aValue, bValue;
         switch (filters.sortBy) {
-          case 'name':
-            aValue = a.name.toLowerCase();
-            bValue = b.name.toLowerCase();
+          case 'nombre':
+            aValue = a.nombre.toLowerCase();
+            bValue = b.nombre.toLowerCase();
             break;
-          case 'price':
-            aValue = a.price;
-            bValue = b.price;
+          case 'precio':
+            aValue = a.precio;
+            bValue = b.precio;
             break;
-          case 'rating':
-            aValue = a.rating || 0;
-            bValue = b.rating || 0;
+          case 'calificacion':
+            aValue = a.calificacion || 0;
+            bValue = b.calificacion || 0;
             break;
           default:
             return 0;
@@ -132,8 +132,8 @@ export class ProductAPI {
   }
 
   // Utilidad para convertir nombre a slug
-  private static nameToSlug(name: string): string {
-    return name
+  private static nombreToSlug(nombre: string): string {
+    return nombre
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-')

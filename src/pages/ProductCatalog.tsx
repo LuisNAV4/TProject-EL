@@ -78,17 +78,17 @@ const ProductCatalog = () => {
   // Filter and sort products
   const productosFiltrados = useMemo(() => {
     let filtrados = productos.filter(producto => {
-      const coincideBusqueda = producto.name.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
-                           producto.description.toLowerCase().includes(terminoBusqueda.toLowerCase());
+      const coincideBusqueda = producto.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+                           producto.descripcion.toLowerCase().includes(terminoBusqueda.toLowerCase());
       
       const coincideCategoria = categoriasSeleccionadas.length === 0 || 
-                             categoriasSeleccionadas.includes(producto.category);
+                             categoriasSeleccionadas.includes(producto.categoria_id);
       
-      const coincidePrecio = producto.price >= rangoPrecio[0] && producto.price <= rangoPrecio[1];
+      const coincidePrecio = producto.precio >= rangoPrecio[0] && producto.precio <= rangoPrecio[1];
       
-      const coincideStock = !mostrarEnStock || producto.inStock;
+      const coincideStock = !mostrarEnStock || producto.en_stock;
       
-      const coincideOferta = !mostrarOferta || (producto.originalPrice && producto.originalPrice > producto.price);
+      const coincideOferta = !mostrarOferta || (producto.precio_original && producto.precio_original > producto.precio);
 
       return coincideBusqueda && coincideCategoria && coincidePrecio && coincideStock && coincideOferta;
     });
@@ -96,15 +96,15 @@ const ProductCatalog = () => {
     // Sort products
     filtrados.sort((a, b) => {
       switch (ordenarPor) {
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
+        case 'precio-low':
+          return a.precio - b.precio;
+        case 'precio-high':
+          return b.precio - a.precio;
         case 'rating':
-          return b.rating - a.rating;
+          return b.calificacion - a.calificacion;
         case 'name':
         default:
-          return a.name.localeCompare(b.name);
+          return a.nombre.localeCompare(b.nombre);
       }
     });
 
@@ -125,7 +125,7 @@ const ProductCatalog = () => {
   };
 
   const manejarClicProducto = (producto: Product) => {
-    const slug = productNameToSlug(producto.name);
+    const slug = productNameToSlug(producto.nombre);
     navigate(`/product/${slug}`);
   };
 
@@ -148,7 +148,7 @@ const ProductCatalog = () => {
         </div>
       </div>
 
-      {/* Price Range */}
+      {/* precio Range */}
       <div>
         <h3 className="font-semibold mb-3">Rango de Precio</h3>
         <div className="space-y-4">
@@ -170,11 +170,11 @@ const ProductCatalog = () => {
       {/* Stock Filter */}
       <div className="flex items-center space-x-2">
         <Checkbox
-          id="inStock"
+          id="en_stock;"
           checked={mostrarEnStock}
           onCheckedChange={(marcado) => establecerMostrarEnStock(marcado === true)}
         />
-        <label htmlFor="inStock" className="text-sm">Solo productos en stock</label>
+        <label htmlFor="en_stock;" className="text-sm">Solo productos en stock</label>
       </div>
 
       {/* Offers Filter */}
@@ -232,9 +232,9 @@ const ProductCatalog = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="name">Nombre A-Z</SelectItem>
-                  <SelectItem value="price-low">Precio: Menor a Mayor</SelectItem>
-                  <SelectItem value="price-high">Precio: Mayor a Menor</SelectItem>
-                  <SelectItem value="rating">Mejor Calificación</SelectItem>
+                  <SelectItem value="precio-low">Precio: Menor a Mayor</SelectItem>
+                  <SelectItem value="precio-high">Precio: Mayor a Menor</SelectItem>
+                  <SelectItem value="calificacion">Mejor Calificación</SelectItem>
                 </SelectContent>
               </Select>
 

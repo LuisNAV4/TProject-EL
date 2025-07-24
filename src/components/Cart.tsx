@@ -19,7 +19,7 @@ interface PropiedadesCarrito {
 
 const Cart = ({ estaAbierto, alCerrar, articulos, alActualizarCantidad, alEliminarArticulo }: PropiedadesCarrito) => {
   const navigate = useNavigate();
-  const total = articulos.reduce((suma, articulo) => suma + (articulo.price * articulo.cantidad), 0);
+  const total = articulos.reduce((suma, articulo) => suma + (articulo.precio * articulo.cantidad), 0);
 
   const irAlCheckout = () => {
     alCerrar();
@@ -55,13 +55,13 @@ const Cart = ({ estaAbierto, alCerrar, articulos, alActualizarCantidad, alElimin
               {articulos.map((articulo) => (
                 <div key={articulo.id} className="flex items-center space-x-4 border-b pb-4">
                   <img
-                    src={articulo.image}
-                    alt={articulo.name}
+                    src={articulo.imagen_url}
+                    alt={articulo.nombre}
                     className="w-16 h-16 object-cover rounded"
                   />
                   <div className="flex-1">
-                    <h3 className="font-semibold">{articulo.name}</h3>
-                    <p className="text-gray-600">${articulo.price.toLocaleString()}</p>
+                    <h3 className="font-semibold">{articulo.nombre}</h3>
+                    <p className="text-gray-600">${articulo.precio.toLocaleString()}</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button

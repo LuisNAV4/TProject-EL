@@ -74,8 +74,8 @@ const ProductInfo = () => {
     );
   }
 
-  const descuento = producto.originalPrice 
-    ? Math.round(((producto.originalPrice - producto.price) / producto.originalPrice) * 100)
+  const descuento = producto.precio_original 
+    ? Math.round(((producto.precio_original - producto.precio) / producto.precio_original) * 100)
     : 0;
 
   const manejarAgregarAlCarrito = () => {
@@ -85,7 +85,7 @@ const ProductInfo = () => {
     }
     toast({
       title: "Producto agregado",
-      description: `${cantidad} ${producto.name} agregado al carrito`,
+      description: `${cantidad} ${producto.nombre} agregado al carrito`,
     });
   };
 
@@ -127,8 +127,8 @@ const ProductInfo = () => {
             <Card className="overflow-hidden">
               <div className="relative">
                 <img
-                  src={producto.image}
-                  alt={producto.name}
+                  src={producto.imagen_url}
+                  alt={producto.nombre}
                   className="w-full h-96 lg:h-[500px] object-cover"
                 />
                 {descuento > 0 && (
@@ -136,7 +136,7 @@ const ProductInfo = () => {
                     -{descuento}%
                   </Badge>
                 )}
-                {!producto.inStock && (
+                {!producto.en_stock && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <span className="text-white font-semibold text-lg">Agotado</span>
                   </div>
@@ -149,54 +149,54 @@ const ProductInfo = () => {
           <div className="space-y-6">
             <div>
               <Badge variant="secondary" className="mb-2">
-                {producto.category}
+                {producto.categoria_id || 'Sin categoría'}
               </Badge>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {producto.name}
+                {producto.nombre}
               </h1>
               
-              {/* Rating */}
+              {/* calificacion */}
               <div className="flex items-center mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       className={`h-5 w-5 ${
-                        i < Math.floor(producto.rating)
+                        i < Math.floor(producto.calificacion)
                           ? 'text-yellow-400 fill-current'
                           : 'text-gray-300'
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-gray-600 ml-2">({producto.rating})</span>
+                <span className="text-gray-600 ml-2">({producto.calificacion})</span>
               </div>
 
-              {/* Price */}
+              {/* precio */}
               <div className="mb-6">
                 <div className="flex items-baseline gap-3">
                   <span className="text-3xl font-bold text-gray-900">
-                    REF: {producto.price.toLocaleString()}
+                    REF: {producto.precio.toLocaleString()}
                   </span>
-                  {producto.originalPrice && (
+                  {producto.precio_original && (
                     <span className="text-xl text-gray-500 line-through">
-                      REF: {producto.originalPrice.toLocaleString()}
+                      REF: {producto.precio_original.toLocaleString()}
                     </span>
                   )}
                 </div>
                 {descuento > 0 && (
                   <span className="text-green-600 font-medium">
-                    Ahorras REF: {(producto.originalPrice! - producto.price).toLocaleString()}
+                    Ahorras REF: {(producto.precio_original! - producto.precio).toLocaleString()}
                   </span>
                 )}
               </div>
 
-              {/* Description */}
+              {/* descripcion */}
               <Card>
                 <CardContent className="p-6">
                   <h3 className="font-semibold mb-3">Descripción</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    {producto.description}
+                    {producto.descripcion}
                   </p>
                 </CardContent>
               </Card>
@@ -230,11 +230,11 @@ const ProductInfo = () => {
               <div className="flex gap-3">
                 <Button
                   onClick={manejarAgregarAlCarrito}
-                  disabled={!producto.inStock}
+                  disabled={!producto.en_stock}
                   className="flex-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:brightness-110"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  {producto.inStock ? 'Agregar al carrito' : 'Agotado'}
+                  {producto.en_stock ? 'Agregar al carrito' : 'Agotado'}
                 </Button>
                 <Button
                   variant="outline"
@@ -251,8 +251,8 @@ const ProductInfo = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <span className="font-medium">Disponibilidad:</span>
-                  <Badge variant={producto.inStock ? "default" : "destructive"}>
-                    {producto.inStock ? 'En stock' : 'Agotado'}
+                  <Badge variant={producto.en_stock ? "default" : "destructive"}>
+                    {producto.en_stock ? 'En stock' : 'Agotado'}
                   </Badge>
                 </div>
               </CardContent>
