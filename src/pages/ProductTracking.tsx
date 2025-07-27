@@ -232,14 +232,27 @@ const ProductTracking = () => {
     );
   }
 
-  // Procesar estados del seguimiento desde la base de datos
-  const estadosDetalles = seguimiento.detalles || [];
-  const iconos = {
-    'pedido_confirmado': CheckCircle,
-    'preparando_envio': Package,
-    'en_camino': Truck,
-    'entregado': CheckCircle
-  };
+  // Estados predefinidos del seguimiento
+  const estadosPredefinidos = [
+    { estado: 'en_espera', descripcion: 'En espera', icono: Package },
+    { estado: 'pago_confirmado', descripcion: 'Pago confirmado', icono: CheckCircle },
+    { estado: 'preparando_envio', descripcion: 'Preparando envío', icono: Package },
+    { estado: 'en_camino', descripcion: 'En camino', icono: Truck },
+    { estado: 'entregado', descripcion: 'Entregado', icono: CheckCircle }
+  ];
+
+  // Obtener el índice del estado actual
+  const estadoActualIndex = estadosPredefinidos.findIndex(e => e.estado === seguimiento.estado_actual);
+  
+  // Procesar estados del seguimiento desde la base de datos con estados predefinidos
+  const estadosDetalles = seguimiento.detalles && seguimiento.detalles.length > 0 
+    ? seguimiento.detalles 
+    : estadosPredefinidos.map((estado, index) => ({
+        estado: estado.estado,
+        descripcion: estado.descripcion,
+        completado: index <= estadoActualIndex,
+        fecha: index <= estadoActualIndex ? new Date().toISOString() : null
+      }));
 
   return (
     <div className="min-h-screen bg-color-primary">
@@ -290,29 +303,57 @@ const ProductTracking = () => {
             
             <div className="space-y-6">
               {estadosDetalles.map((paso, index) => {
-                const Icono = iconos[paso.estado] || Package;
+                const estadoPredefinido = estadosPredefinidos.find(e => e.estado === paso.estado);
+                const Icono = estadoPredefinido?.icono || Package;
+                const esActual = seguimiento.estado_actual === paso.estado;
+                
                 return (
                   <div key={index} className="flex items-center space-x-4">
-                    <div className={`p-2 rounded-full ${
+                    {/* Línea conectora */}
+                    {index > 0 && (
+                      <div className="absolute left-6 -mt-6 w-0.5 h-6 bg-gray-200"></div>
+                    )}
+                    
+                    <div className={`relative p-3 rounded-full transition-all duration-300 ${
                       paso.completado 
-                        ? 'bg-green-100 text-green-600' 
+                        ? 'bg-green-100 text-green-600 ring-2 ring-green-200' 
+                        : esActual
+                        ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-200 animate-pulse'
                         : 'bg-gray-100 text-gray-400'
                     }`}>
                       <Icono className="h-6 w-6" />
                     </div>
+                    
                     <div className="flex-1">
-                      <h3 className={`font-semibold ${
-                        paso.completado ? 'text-green-600' : 'text-gray-500'
+                      <h3 className={`font-semibold transition-colors duration-300 ${
+                        paso.completado 
+                          ? 'text-green-600' 
+                          : esActual
+                          ? 'text-blue-600'
+                          : 'text-gray-500'
                       }`}>
                         {paso.descripcion}
+                        {esActual && (
+                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                            Actual
+                          </span>
+                        )}
                       </h3>
+                      
                       {paso.completado && paso.fecha && (
-                        <p className="text-sm text-gray-600">
-                          Completado el {new Date(paso.fecha).toLocaleDateString('es-ES')}
+                        <p className="text-sm text-green-600 font-medium">
+                          ✓ Completado el {new Date(paso.fecha).toLocaleDateString('es-ES')}
                         </p>
                       )}
-                      {!paso.completado && (
+                      
+                      {!paso.completado && !esActual && (
                         <p className="text-sm text-gray-500">Pendiente</p>
+                      )}
+                      
+                      {esActual && !paso.completado && (
+                        <p className="text-sm text-blue-600 font-medium">
+                          🔄 En proceso...
+                        </p>
                       )}
                     </div>
                   </div>
