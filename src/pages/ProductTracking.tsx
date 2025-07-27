@@ -1,56 +1,245 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, MessageCircle, Truck, CheckCircle, TicketIcon } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Package, MessageCircle, Truck, CheckCircle, TicketIcon, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
 import Header from '../components/Header';
 import { usarCarrito } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { WhatsAppFloat } from "@/components/ui/whatsapp";
+import { supabase } from '@/integrations/supabase/client';
 
 const ProductTracking = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { contadorArticulosCarrito, establecerCarritoAbierto } = usarCarrito();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  
   const [mensajeChat, establecerMensajeChat] = useState('');
-  const [mensajesChat, establecerMensajesChat] = useState([
-    {
-      id: 1,
-      remitente: 'vendedor',
-      mensaje: '¡Hola! Tu pedido ha sido confirmado. ¿En qué puedo ayudarte?',
-      timestamp: new Date(Date.now() - 300000).toLocaleTimeString()
-    }
-  ]);
+  const [mensajesChat, establecerMensajesChat] = useState([]);
+  const [seguimiento, setSeguimiento] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [actualizando, setActualizando] = useState(false);
+  const messagesEndRef = useRef(null);
 
-  const enviarMensaje = () => {
-    if (mensajeChat.trim()) {
-      const nuevoMensaje = {
-        id: mensajesChat.length + 1,
-        remitente: 'usuario',
-        mensaje: mensajeChat,
-        timestamp: new Date().toLocaleTimeString()
-      };
-      establecerMensajesChat([...mensajesChat, nuevoMensaje]);
-      establecerMensajeChat('');
-      
-      // Simular respuesta del vendedor
-      setTimeout(() => {
-        const respuestaVendedor = {
-          id: mensajesChat.length + 2,
-          remitente: 'vendedor',
-          mensaje: 'Gracias por tu mensaje. Te responderé lo antes posible.',
-          timestamp: new Date().toLocaleTimeString()
-        };
-        establecerMensajesChat(prev => [...prev, respuestaVendedor]);
-      }, 2000);
+  // Obtener número de pedido de los parámetros de URL o usar uno por defecto
+  const numeroPedido = searchParams.get('numero') || 'TRK123456789';
+
+  // Scroll automático al final de los mensajes
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [mensajesChat]);
+
+  // Cargar datos de seguimiento
+  const cargarSeguimiento = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('seguimiento_pedidos')
+        .select('*')
+        .eq('numero_pedido', numeroPedido)
+        .eq('usuario_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error al cargar seguimiento:', error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la información del seguimiento",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setSeguimiento(data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setCargando(false);
     }
   };
 
-  const estadosPedido = [
-    { icono: CheckCircle, estado: 'Pedido Confirmado', completado: true },
-    { icono: Package, estado: 'Preparando Envío', completado: true },
-    { icono: Truck, estado: 'En Camino', completado: false },
-    { icono: CheckCircle, estado: 'Entregado', completado: false }
-  ];
+  // Cargar mensajes del chat
+  const cargarMensajes = async () => {
+    if (!user || !seguimiento) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('mensajes_seguimiento')
+        .select('*')
+        .eq('seguimiento_id', seguimiento.id)
+        .order('fecha', { ascending: true });
+
+      if (error) {
+        console.error('Error al cargar mensajes:', error);
+        return;
+      }
+
+      establecerMensajesChat(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  // Refrescar estado del envío
+  const refrescarEstado = async () => {
+    setActualizando(true);
+    await cargarSeguimiento();
+    setActualizando(false);
+    toast({
+      title: "Estado actualizado",
+      description: "La información del seguimiento ha sido actualizada",
+    });
+  };
+
+  // Enviar mensaje
+  const enviarMensaje = async () => {
+    if (!mensajeChat.trim() || !user || !seguimiento) return;
+
+    try {
+      const { error } = await supabase
+        .from('mensajes_seguimiento')
+        .insert([
+          {
+            seguimiento_id: seguimiento.id,
+            usuario_id: user.id,
+            mensaje: mensajeChat,
+            remitente: 'usuario'
+          }
+        ]);
+
+      if (error) {
+        console.error('Error al enviar mensaje:', error);
+        toast({
+          title: "Error",
+          description: "No se pudo enviar el mensaje",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      establecerMensajeChat('');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  // Configurar suscripciones en tiempo real
+  useEffect(() => {
+    if (!user) return;
+
+    // Suscripción para cambios en el seguimiento
+    const seguimientoChannel = supabase
+      .channel('seguimiento-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'seguimiento_pedidos',
+          filter: `usuario_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Seguimiento actualizado:', payload);
+          setSeguimiento(payload.new);
+          toast({
+            title: "Estado actualizado",
+            description: "El estado de tu pedido ha cambiado",
+          });
+        }
+      )
+      .subscribe();
+
+    // Suscripción para nuevos mensajes
+    const mensajesChannel = supabase
+      .channel('mensajes-tracking-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'mensajes_seguimiento'
+        },
+        (payload) => {
+          console.log('Nuevo mensaje:', payload);
+          if (seguimiento && payload.new.seguimiento_id === seguimiento.id) {
+            establecerMensajesChat(prev => [...prev, payload.new]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(seguimientoChannel);
+      supabase.removeChannel(mensajesChannel);
+    };
+  }, [user, seguimiento]);
+
+  // Cargar datos inicial
+  useEffect(() => {
+    if (user) {
+      cargarSeguimiento();
+    }
+  }, [user, numeroPedido]);
+
+  // Cargar mensajes cuando se carga el seguimiento
+  useEffect(() => {
+    if (seguimiento) {
+      cargarMensajes();
+    }
+  }, [seguimiento]);
+
+  // Si no hay usuario, redirigir al login
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-color-primary flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Inicia sesión para ver tu seguimiento</h2>
+          <Button onClick={() => navigate('/')}>
+            Ir al inicio
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (cargando) {
+    return (
+      <div className="min-h-screen bg-color-primary flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <p className="mt-4">Cargando información del seguimiento...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!seguimiento) {
+    return (
+      <div className="min-h-screen bg-color-primary flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Seguimiento no encontrado</h2>
+          <p className="mb-4">No se encontró información para el número de seguimiento: {numeroPedido}</p>
+          <Button onClick={() => navigate(-1)}>
+            Volver
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Procesar estados del seguimiento desde la base de datos
+  const estadosDetalles = seguimiento.detalles || [];
+  const iconos = {
+    'pedido_confirmado': CheckCircle,
+    'preparando_envio': Package,
+    'en_camino': Truck,
+    'entregado': CheckCircle
+  };
 
   return (
     <div className="min-h-screen bg-color-primary">
@@ -86,11 +275,22 @@ const ProductTracking = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Estado del Pedido */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-semibold mb-6">Estado de tu Pedido</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">Estado de tu Pedido</h2>
+              <Button
+                onClick={refrescarEstado}
+                disabled={actualizando}
+                variant="outline"
+                size="sm"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${actualizando ? 'animate-spin' : ''}`} />
+                {actualizando ? 'Actualizando...' : 'Refrescar'}
+              </Button>
+            </div>
             
             <div className="space-y-6">
-              {estadosPedido.map((paso, index) => {
-                const Icono = paso.icono;
+              {estadosDetalles.map((paso, index) => {
+                const Icono = iconos[paso.estado] || Package;
                 return (
                   <div key={index} className="flex items-center space-x-4">
                     <div className={`p-2 rounded-full ${
@@ -104,10 +304,15 @@ const ProductTracking = () => {
                       <h3 className={`font-semibold ${
                         paso.completado ? 'text-green-600' : 'text-gray-500'
                       }`}>
-                        {paso.estado}
+                        {paso.descripcion}
                       </h3>
-                      {paso.completado && (
-                        <p className="text-sm text-gray-600">Completado</p>
+                      {paso.completado && paso.fecha && (
+                        <p className="text-sm text-gray-600">
+                          Completado el {new Date(paso.fecha).toLocaleDateString('es-ES')}
+                        </p>
+                      )}
+                      {!paso.completado && (
+                        <p className="text-sm text-gray-500">Pendiente</p>
                       )}
                     </div>
                   </div>
@@ -118,10 +323,13 @@ const ProductTracking = () => {
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <h3 className="font-semibold text-blue-800 mb-2">Información de Envío</h3>
               <p className="text-blue-700 text-sm">
-                Número de seguimiento: <strong>TRK123456789</strong>
+                Número de seguimiento: <strong>{seguimiento.numero_seguimiento}</strong>
               </p>
               <p className="text-blue-700 text-sm">
-                Tiempo estimado de entrega: 2-3 días hábiles
+                Tiempo estimado de entrega: {seguimiento.tiempo_estimado_entrega}
+              </p>
+              <p className="text-blue-700 text-sm">
+                Estado actual: <strong className="capitalize">{seguimiento.estado_actual.replace('_', ' ')}</strong>
               </p>
             </div>
           </div>
@@ -149,13 +357,17 @@ const ProductTracking = () => {
                       <p className={`text-xs mt-1 ${
                         mensaje.remitente === 'usuario' ? 'text-blue-100' : 'text-gray-500'
                       }`}>
-                        {mensaje.timestamp}
+                        {new Date(mensaje.fecha).toLocaleTimeString('es-ES', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
                       </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                 ))}
+                 <div ref={messagesEndRef} />
+               </div>
+             </div>
             
             <div className="flex space-x-2">
               <Input

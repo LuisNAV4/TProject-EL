@@ -287,6 +287,44 @@ export type Database = {
           },
         ]
       }
+      mensajes_seguimiento: {
+        Row: {
+          fecha: string
+          id: string
+          leido: boolean | null
+          mensaje: string
+          remitente: string
+          seguimiento_id: string
+          usuario_id: string | null
+        }
+        Insert: {
+          fecha?: string
+          id?: string
+          leido?: boolean | null
+          mensaje: string
+          remitente: string
+          seguimiento_id: string
+          usuario_id?: string | null
+        }
+        Update: {
+          fecha?: string
+          id?: string
+          leido?: boolean | null
+          mensaje?: string
+          remitente?: string
+          seguimiento_id?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensajes_seguimiento_seguimiento_id_fkey"
+            columns: ["seguimiento_id"]
+            isOneToOne: false
+            referencedRelation: "seguimiento_pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mensajes_tickets: {
         Row: {
           fecha: string | null
@@ -584,6 +622,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      seguimiento_pedidos: {
+        Row: {
+          detalles: Json | null
+          estado_actual: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          numero_pedido: string
+          numero_seguimiento: string | null
+          tiempo_estimado_entrega: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          detalles?: Json | null
+          estado_actual?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          numero_pedido: string
+          numero_seguimiento?: string | null
+          tiempo_estimado_entrega?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          detalles?: Json | null
+          estado_actual?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          numero_pedido?: string
+          numero_seguimiento?: string | null
+          tiempo_estimado_entrega?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: []
       }
       tickets: {
         Row: {
