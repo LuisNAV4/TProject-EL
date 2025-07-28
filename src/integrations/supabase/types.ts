@@ -117,6 +117,39 @@ export type Database = {
           },
         ]
       }
+      chatbot_qa: {
+        Row: {
+          activo: boolean | null
+          categoria: string | null
+          created_at: string
+          id: string
+          orden: number | null
+          pregunta: string
+          respuesta: string
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean | null
+          categoria?: string | null
+          created_at?: string
+          id?: string
+          orden?: number | null
+          pregunta: string
+          respuesta: string
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean | null
+          categoria?: string | null
+          created_at?: string
+          id?: string
+          orden?: number | null
+          pregunta?: string
+          respuesta?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       descuentos: {
         Row: {
           activo: boolean | null
@@ -363,6 +396,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pago_movil_data: {
+        Row: {
+          activo: boolean | null
+          banco: string
+          cedula: string
+          created_at: string
+          id: string
+          nombre: string
+          telefono: string
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean | null
+          banco: string
+          cedula: string
+          created_at?: string
+          id?: string
+          nombre: string
+          telefono: string
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean | null
+          banco?: string
+          cedula?: string
+          created_at?: string
+          id?: string
+          nombre?: string
+          telefono?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       pedidos: {
         Row: {
@@ -706,6 +772,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      transferencia_data: {
+        Row: {
+          activo: boolean | null
+          banco: string
+          cedula: string
+          created_at: string
+          id: string
+          nombre: string
+          numero_cuenta: string
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean | null
+          banco: string
+          cedula: string
+          created_at?: string
+          id?: string
+          nombre: string
+          numero_cuenta: string
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean | null
+          banco?: string
+          cedula?: string
+          created_at?: string
+          id?: string
+          nombre?: string
+          numero_cuenta?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       usuarios: {
         Row: {
