@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, User, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthDropdown from './auth/AuthDropdown';
 import { useNavigate } from 'react-router-dom';
@@ -97,6 +97,17 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
 
           {/* Right section */}
           <div className="flex items-center space-x-4">
+            {/* Botón de Tickets de Ayuda */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/tickets')}
+              className="hidden md:flex items-center space-x-2 text-[var(--color-text)] hover:text-[var(--color-primary)]"
+              title="Tickets de Ayuda"
+            >
+              <HelpCircle className="h-5 w-5" />
+              <span className="text-sm">Ayuda</span>
+            </Button>
             <AuthDropdown />
             <Button
               variant="ghost"
@@ -131,6 +142,19 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
                 <AuthDropdown />
               </li>
             )}
+            {/* Botón de Tickets para móvil */}
+            <li className="md:hidden">
+              <button
+                onClick={() => {
+                  navigate('/tickets');
+                  setIsMenuOpen(false);
+                }}
+                className="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors duration-200 block py-2 select-none cursor-pointer flex items-center space-x-2"
+              >
+                <HelpCircle className="h-5 w-5" />
+                <span>Tickets de Ayuda</span>
+              </button>
+            </li>
             {categories.map((category) => (
               <li key={category}>
                 <button
