@@ -1,25 +1,121 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usarCarrito } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { CreditCard, Smartphone, Building2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
 import { WhatsAppFloat } from "@/components/ui/whatsapp";
+import { supabase } from '@/integrations/supabase/client';
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { articulosCarrito, contadorArticulosCarrito, establecerCarritoAbierto } = usarCarrito();
   const [metodoSeleccionado, establecerMetodoSeleccionado] = useState('');
+  const [datosPagoMovil, setDatosPagoMovil] = useState<any[]>([]);
+  const [datosTransferencia, setDatosTransferencia] = useState<any[]>([]);
 
   const total = articulosCarrito.reduce((suma, articulo) => suma + (articulo.precio * articulo.cantidad), 0);
 
-  const manejarProcesarPago = () => {
+  // Cargar datos de pago desde la base de datos
+  useEffect(() => {
+    const cargarDatosPago = async () => {
+      try {
+        const { data: pagoMovil } = await supabase
+          .from('pago_movil_data')
+          .select('*')
+          .eq('activo', true);
+          
+        const { data: transferencia } = await supabase
+          .from('transferencia_data')
+          .select('*')
+          .eq('activo', true);
+          
+        setDatosPagoMovil(pagoMovil || []);
+        setDatosTransferencia(transferencia || []);
+      } catch (error) {
+        console.error('Error cargando datos de pago:', error);
+      }
+    };
+
+    cargarDatosPago();
+  }, []);
+
+  const manejarProcesarPago = async () => {
+    if (!user) {
+      alert('Debes iniciar sesión para realizar una compra');
+      return;
+    }
+
     if (metodoSeleccionado === 'transferencia' || metodoSeleccionado === 'pago-movil') {
-      // Redirigir a la página de confirmación de pago
-      navigate('/payment-confirmation', {
-        state: { metodoSeleccionado }
-      });
+      // Crear el pedido en la base de datos
+      try {
+        const numeroPedido = `P${Date.now()}`;
+        
+        // Insertar el pedido
+        const { data: pedido, error: errorPedido } = await supabase
+          .from('pedidos')
+          .insert({
+            numero_pedido: numeroPedido,
+            usuario_id: parseInt(user.id) as any, // Temporal fix para tipo
+            monto_total: total,
+            metodo_pago: metodoSeleccionado === 'pago-movil' ? 'contra_entrega' : 'transferencia_bancaria',
+            direccion_envio: 'Por definir',
+            direccion_facturacion: 'Por definir',
+            estado: 'pendiente',
+            estado_pago: 'pendiente'
+          } as any)
+          .select()
+          .single();
+
+        if (errorPedido) throw errorPedido;
+
+        // Insertar items del pedido
+        const itemsPedido = articulosCarrito.map(item => ({
+          pedido_id: pedido.id,
+          producto_id: item.id,
+          nombre_producto: item.nombre,
+          cantidad: item.cantidad,
+          precio_unitario: item.precio,
+          subtotal: item.precio * item.cantidad
+        }));
+
+        const { error: errorItems } = await supabase
+          .from('items_pedido')
+          .insert(itemsPedido);
+
+        if (errorItems) throw errorItems;
+
+        // Crear registro de tracking
+        await supabase
+          .from('seguimiento_pedidos')
+          .insert({
+            numero_pedido: numeroPedido,
+            usuario_id: user.id,
+            estado_actual: 'pedido_confirmado',
+            detalles: [
+              {
+                estado: 'pedido_confirmado',
+                fecha: new Date().toISOString(),
+                descripcion: 'Pedido confirmado y en espera de pago'
+              }
+            ]
+          });
+
+        // Redirigir a la página de confirmación de pago
+        navigate('/payment-confirmation', {
+          state: { 
+            metodoSeleccionado,
+            numeroPedido,
+            datosPago: metodoSeleccionado === 'pago-movil' ? datosPagoMovil : datosTransferencia
+          }
+        });
+      } catch (error) {
+        console.error('Error procesando pedido:', error);
+        alert('Error al procesar el pedido. Intenta nuevamente.');
+      }
     } else {
       // Para PayPal y Stripe se puede implementar la lógica correspondiente
       alert(`Procesando pago con ${metodoSeleccionado}`);
@@ -43,13 +139,13 @@ const Checkout = () => {
       id: 'pago-movil',
       nombre: 'Pago Móvil',
       icono: Smartphone,
-      descripcion: 'Transferencia desde tu banco móvil'
+      descripcion: `Transferir a: ${datosPagoMovil.length > 0 ? datosPagoMovil[0].telefono : 'Cargando...'}`
     },
     {
       id: 'transferencia',
       nombre: 'Transferencia Bancaria',
       icono: Building2,
-      descripcion: 'Transferencia directa a nuestra cuenta'
+      descripcion: `Cuenta: ${datosTransferencia.length > 0 ? datosTransferencia[0].numero_cuenta : 'Cargando...'}`
     }
   ];
 

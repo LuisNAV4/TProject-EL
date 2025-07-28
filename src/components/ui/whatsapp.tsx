@@ -1,12 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
 import WhatsappLogo from "@/images/whatsapp-logo.svg";
-import { io } from "socket.io-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-
-// Solo una instancia de socket
-const socket = io("http://localhost:3000");
 
 const USER_ID = "1234";
 
@@ -15,12 +11,15 @@ export const WhatsAppFloat = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [preguntasFrecuentes, setPreguntasFrecuentes] = useState<any[]>([]);
+  const [mostrandoPreguntas, setMostrandoPreguntas] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
 
-  // Obtener perfil del usuario autenticado
+  // Obtener perfil del usuario y preguntas frecuentes
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchData = async () => {
+      // Cargar perfil del usuario
       if (user) {
         const { data } = await supabase
           .from('profiles')
@@ -29,11 +28,18 @@ export const WhatsAppFloat = () => {
           .single();
         setUserProfile(data);
       }
+
+      // Cargar preguntas frecuentes del chatbot
+      const { data: preguntas } = await supabase
+        .from('chatbot_qa')
+        .select('*')
+        .eq('activo', true)
+        .order('orden');
+      
+      setPreguntasFrecuentes(preguntas || []);
     };
 
-    if (user) {
-      fetchUserProfile();
-    }
+    fetchData();
   }, [user]);
 
   // Función para obtener el nombre a mostrar
@@ -46,16 +52,6 @@ export const WhatsAppFloat = () => {
     }
     return `Usuario-${USER_ID.slice(-6)}`; // Últimos 6 dígitos del UUID para usuarios no registrados
   };
-
-  // Recibir mensajes en tiempo real
-  useEffect(() => {
-    socket.on("nuevoMensaje", (mensaje: any) => {
-      setMessages((prev) => [...prev, mensaje]);
-    });
-    return () => {
-      socket.off("nuevoMensaje");
-    };
-  }, []);
 
   // Scroll automático y persistencia
   useEffect(() => {
@@ -81,21 +77,50 @@ export const WhatsAppFloat = () => {
     }
   }, []);
 
-  const handleSend = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!input.trim()) return;
+  const handleSend = (texto?: string) => {
+    const mensajeTexto = texto || input;
+    if (!mensajeTexto.trim()) return;
+    
     const now = new Date();
-    const msg = {
+    const msgUsuario = {
       from: "user",
       id: user?.id || USER_ID,
       user: getUserDisplayName(),
-      text: input,
+      text: mensajeTexto,
       timestamp: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
     };
-    // Emitir el mensaje al servidor
-    socket.emit("nuevoMensaje", msg);
-    // No agregarlo localmente aquí, solo lo agregará el socket.on("nuevoMensaje")
+    
+    setMessages(prev => [...prev, msgUsuario]);
     setInput("");
+    setMostrandoPreguntas(false);
+    
+    // Simular respuesta del bot después de un breve delay
+    setTimeout(() => {
+      const msgBot = {
+        from: "bot",
+        id: "bot",
+        user: "Asistente Virtual",
+        text: "Gracias por tu mensaje. Un agente se comunicará contigo pronto. Mientras tanto, puedes contactarnos directamente por WhatsApp usando el ícono de arriba.",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
+      };
+      setMessages(prev => [...prev, msgBot]);
+    }, 1000);
+  };
+
+  const handlePreguntaClick = (pregunta: any) => {
+    handleSend(pregunta.pregunta);
+    
+    // Responder automáticamente con la respuesta de la base de datos
+    setTimeout(() => {
+      const msgBot = {
+        from: "bot",
+        id: "bot",
+        user: "Asistente Virtual",
+        text: pregunta.respuesta,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
+      };
+      setMessages(prev => [...prev, msgBot]);
+    }, 500);
   };
 
   return (
@@ -187,6 +212,44 @@ export const WhatsAppFloat = () => {
               gap: "10px",
             }}
           >
+            {mostrandoPreguntas && messages.length === 0 && (
+              <div style={{ marginBottom: "15px" }}>
+                <div style={{ 
+                  fontSize: "14px", 
+                  color: "#666", 
+                  marginBottom: "10px",
+                  textAlign: "center"
+                }}>
+                  ¡Hola! ¿En qué puedo ayudarte?
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {preguntasFrecuentes.slice(0, 5).map((pregunta) => (
+                    <button
+                      key={pregunta.id}
+                      onClick={() => handlePreguntaClick(pregunta)}
+                      style={{
+                        background: "#fff",
+                        border: "1px solid #ddd",
+                        borderRadius: "8px",
+                        padding: "10px",
+                        fontSize: "13px",
+                        color: "#333",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        transition: "background 0.2s",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.background = "#f0f0f0")
+                      }
+                      onMouseOut={(e) => (e.currentTarget.style.background = "#fff")}
+                    >
+                      {pregunta.pregunta}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -215,7 +278,10 @@ export const WhatsAppFloat = () => {
           </div>
           {/* Input y acciones */}
           <form
-            onSubmit={handleSend}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -241,6 +307,7 @@ export const WhatsAppFloat = () => {
               onKeyDown={(e) => {
                 // Solo enviar si es Enter y no está repitiendo (evita mantener pulsado)
                 if (e.key === "Enter" && !e.shiftKey && !e.repeat) {
+                  e.preventDefault();
                   handleSend();
                 }
               }}
