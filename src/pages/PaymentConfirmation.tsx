@@ -8,17 +8,22 @@ import { Label } from '@/components/ui/label';
 import Header from '../components/Header';
 import { usarCarrito } from '../contexts/CartContext';
 import { WhatsAppFloat } from "@/components/ui/whatsapp";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const PaymentConfirmation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { contadorArticulosCarrito, establecerCarritoAbierto } = usarCarrito();
+  const { toast } = useToast();
   
   const metodoSeleccionado = location.state?.metodoSeleccionado || '';
+  const orderData = location.state?.orderData || null;
   
   const [numeroReferencia, establecerNumeroReferencia] = useState('');
   const [imagenPago, establecerImagenPago] = useState<File | null>(null);
   const [previsualizacionImagen, establecerPrevisualizacionImagen] = useState<string>('');
+  const [procesando, setProcesando] = useState(false);
 
   // Datos del vendedor (en un proyecto real estos vendrían de una API)
   const datosVendedor = {
@@ -51,20 +56,87 @@ const PaymentConfirmation = () => {
     }
   };
 
-  const confirmarPago = () => {
-    if (numeroReferencia.trim() && imagenPago) {
-      // Aquí se enviarían los datos al servidor
-      console.log('Referencia:', numeroReferencia);
-      console.log('Imagen:', imagenPago);
-      
-      // Redirigir a tracking
+  const confirmarPago = async () => {
+    if (!numeroReferencia.trim() || !imagenPago || !orderData) {
+      toast({
+        title: "Error",
+        description: "Por favor completa todos los campos requeridos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setProcesando(true);
+
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Debes estar autenticado para confirmar el pago",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Upload image to storage
+      const fileExt = imagenPago.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('comprobantes-pago')
+        .upload(filePath, imagenPago);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL for the uploaded image
+      const { data: { publicUrl } } = supabase.storage
+        .from('comprobantes-pago')
+        .getPublicUrl(filePath);
+
+      // Update the order with payment information
+      const { error: updateError } = await supabase
+        .from('pedidos')
+        .update({
+          numero_referencia_pago: numeroReferencia,
+          url_comprobante_pago: publicUrl,
+          fecha_pago: new Date().toISOString(),
+          estado_pago: 'pendiente'
+        })
+        .eq('id', orderData.orderId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      toast({
+        title: "Pago confirmado",
+        description: "Tu comprobante ha sido enviado correctamente. Verificaremos el pago en las próximas horas.",
+      });
+
+      // Redirect to tracking
       navigate('/tracking', {
         state: {
           numeroReferencia,
           metodoSeleccionado,
-          fechaPago: new Date().toISOString()
+          fechaPago: new Date().toISOString(),
+          orderId: orderData.orderId
         }
       });
+
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      toast({
+        title: "Error",
+        description: "Hubo un problema al confirmar el pago. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setProcesando(false);
     }
   };
 
@@ -207,10 +279,10 @@ const PaymentConfirmation = () => {
 
               <Button
                 onClick={confirmarPago}
-                disabled={!puedeConfirmar}
+                disabled={!puedeConfirmar || procesando}
                 className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:brightness-110"
               >
-                Confirmar Pago y Continuar
+                {procesando ? 'Procesando...' : 'Confirmar Pago y Continuar'}
               </Button>
             </div>
           </div>

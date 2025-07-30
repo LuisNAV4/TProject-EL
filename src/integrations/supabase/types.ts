@@ -438,13 +438,16 @@ export type Database = {
           estado_pago: Database["public"]["Enums"]["estado_pago_enum"] | null
           fecha_entrega: string | null
           fecha_estimada_entrega: string | null
+          fecha_pago: string | null
           fecha_pedido: string | null
           id: number
           metodo_pago: Database["public"]["Enums"]["metodo_pago_enum"]
           monto_total: number
           notas: string | null
           numero_pedido: string
+          numero_referencia_pago: string | null
           numero_seguimiento: string | null
+          url_comprobante_pago: string | null
           usuario_id: number
         }
         Insert: {
@@ -454,13 +457,16 @@ export type Database = {
           estado_pago?: Database["public"]["Enums"]["estado_pago_enum"] | null
           fecha_entrega?: string | null
           fecha_estimada_entrega?: string | null
+          fecha_pago?: string | null
           fecha_pedido?: string | null
           id?: number
           metodo_pago: Database["public"]["Enums"]["metodo_pago_enum"]
           monto_total: number
           notas?: string | null
           numero_pedido: string
+          numero_referencia_pago?: string | null
           numero_seguimiento?: string | null
+          url_comprobante_pago?: string | null
           usuario_id: number
         }
         Update: {
@@ -470,13 +476,16 @@ export type Database = {
           estado_pago?: Database["public"]["Enums"]["estado_pago_enum"] | null
           fecha_entrega?: string | null
           fecha_estimada_entrega?: string | null
+          fecha_pago?: string | null
           fecha_pedido?: string | null
           id?: number
           metodo_pago?: Database["public"]["Enums"]["metodo_pago_enum"]
           monto_total?: number
           notas?: string | null
           numero_pedido?: string
+          numero_referencia_pago?: string | null
           numero_seguimiento?: string | null
+          url_comprobante_pago?: string | null
           usuario_id?: number
         }
         Relationships: [

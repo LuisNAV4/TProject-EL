@@ -109,7 +109,11 @@ const Checkout = () => {
           state: { 
             metodoSeleccionado,
             numeroPedido,
-            datosPago: metodoSeleccionado === 'pago-movil' ? datosPagoMovil : datosTransferencia
+            datosPago: metodoSeleccionado === 'pago-movil' ? datosPagoMovil : datosTransferencia,
+            orderData: {
+              orderId: pedido.id,
+              numeroSeguimiento: numeroPedido
+            }
           }
         });
       } catch (error) {
