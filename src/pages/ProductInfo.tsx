@@ -12,6 +12,7 @@ import { Product } from '../components/ProductCard';
 import { WhatsAppFloat } from '@/components/ui/whatsapp';
 import Cart from '../components/Cart';
 import Header from '../components/Header';
+import { ProductReviews } from '../components/ProductReviews';
 
 const ProductInfo = () => {
   const { slug } = useParams();
@@ -258,6 +259,14 @@ const ProductInfo = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Product Reviews Section */}
+        <div className="mt-12">
+          <ProductReviews 
+            productId={producto.id} 
+            productName={producto.nombre} 
+          />
         </div>
       </div>
 
