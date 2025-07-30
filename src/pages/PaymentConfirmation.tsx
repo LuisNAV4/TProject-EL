@@ -73,8 +73,34 @@ const PaymentConfirmation = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
-          title: "Error",
-          description: "Debes estar autenticado para confirmar el pago",
+          title: "Error de autenticación",
+          description: "Debes estar registrado e iniciar sesión para confirmar el pago",
+          variant: "destructive",
+        });
+        navigate('/auth');
+        return;
+      }
+
+      // Verify that the order belongs to the current user
+      const { data: pedido, error: pedidoError } = await supabase
+        .from('pedidos')
+        .select('id, usuario_id')
+        .eq('id', orderData.orderId)
+        .single();
+
+      if (pedidoError) {
+        throw new Error('No se pudo verificar la orden');
+      }
+
+      if (!pedido) {
+        throw new Error('La orden no existe');
+      }
+
+      // Check if the order belongs to the current user
+      if (pedido.usuario_id.toString() !== user.id) {
+        toast({
+          title: "Error de autorización",
+          description: "Esta orden no pertenece a tu cuenta",
           variant: "destructive",
         });
         return;
@@ -82,7 +108,6 @@ const PaymentConfirmation = () => {
 
       // Upload image to storage
       const fileExt = imagenPago.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
       const filePath = `${user.id}/${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
@@ -98,7 +123,7 @@ const PaymentConfirmation = () => {
         .from('comprobantes-pago')
         .getPublicUrl(filePath);
 
-      // Update the order with payment information
+      // Update the order with payment information - RLS will ensure only the owner can update
       const { error: updateError } = await supabase
         .from('pedidos')
         .update({
@@ -107,7 +132,8 @@ const PaymentConfirmation = () => {
           fecha_pago: new Date().toISOString(),
           estado_pago: 'pendiente'
         })
-        .eq('id', orderData.orderId);
+        .eq('id', orderData.orderId)
+        .eq('usuario_id', parseInt(user.id) as any); // Double security check
 
       if (updateError) {
         throw updateError;
@@ -132,7 +158,7 @@ const PaymentConfirmation = () => {
       console.error('Error confirming payment:', error);
       toast({
         title: "Error",
-        description: "Hubo un problema al confirmar el pago. Inténtalo de nuevo.",
+        description: error.message || "Hubo un problema al confirmar el pago. Inténtalo de nuevo.",
         variant: "destructive",
       });
     } finally {
