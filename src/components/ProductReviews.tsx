@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Review {
   id: number;
-  usuario_id: string;
+  usuario_id: number;
   calificacion: number;
   comentario: string;
   fecha_creacion: string;
@@ -43,25 +43,30 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, produ
     try {
       setLoading(true);
       
-      // Get reviews with user profiles
+      // Get reviews with user data - simplified approach
       const { data: reviewsData, error } = await supabase
         .from('resenas')
-        .select(`
-          id,
-          usuario_id,
-          calificacion,
-          comentario,
-          fecha_creacion,
-          profiles!inner(nombre_completo)
-        `)
+        .select('*')
         .eq('producto_id', productId)
         .order('fecha_creacion', { ascending: false });
 
       if (error) throw error;
 
+      // Get user profiles for review authors
+      const userIds = reviewsData?.map(review => review.usuario_id.toString()) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, nombre_completo')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error loading profiles:', profilesError);
+      }
+
+      // Combine reviews with user names
       const formattedReviews = reviewsData?.map(review => ({
         ...review,
-        usuario_nombre: review.profiles?.nombre_completo || 'Usuario Anónimo'
+        usuario_nombre: profilesData?.find(profile => profile.id === review.usuario_id.toString())?.nombre_completo || 'Usuario Anónimo'
       })) || [];
 
       setReviews(formattedReviews);
@@ -117,7 +122,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, produ
         .from('resenas')
         .select('id')
         .eq('producto_id', productId)
-        .eq('usuario_id', user.id)
+        .eq('usuario_id', parseInt(user.id))
         .single();
 
       if (checkError && checkError.code !== 'PGRST116') {
@@ -137,7 +142,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, produ
         .from('resenas')
         .insert({
           producto_id: productId,
-          usuario_id: user.id,
+          usuario_id: parseInt(user.id),
           calificacion: newReview.calificacion,
           comentario: newReview.comentario.trim()
         });
