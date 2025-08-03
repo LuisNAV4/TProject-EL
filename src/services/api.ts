@@ -10,11 +10,11 @@ export class ProductAPI {
   static async getProducts(): Promise<Product[]> {
     try {
       // TODO: Reemplazar con llamada real a API externa
-      //  const response = await fetch(`${this.baseUrl}/api/productos`);
-      //  return response.json();
+        const response = await fetch(`${this.baseUrl}/api/productos`);
+        return response.json();
       
       // Por ahora retornamos datos de muestra
-      return Promise.resolve(sampleProducts);
+      //return Promise.resolve(sampleProducts);
     } catch (error) {
       console.error('Error al obtener productos:', error);
       return sampleProducts; // Fallback a datos locales
