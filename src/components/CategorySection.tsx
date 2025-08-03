@@ -1,53 +1,63 @@
 
-import React from 'react';
-import { Smartphone, Laptop, Headphones, Camera, Watch, Gamepad2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Smartphone, Laptop, Headphones, Camera, Watch, Gamepad2, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ProductAPI } from '@/services/api';
 
 const CategorySection = () => {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState<any[]>([]);
 
-  const handleCategoryClick = (categoryTitle: string) => {
-    navigate('/products', { state: { selectedCategories: [categoryTitle] } });
+  const handleCategoryClick = (categoryName: string) => {
+    navigate('/products', { state: { selectedCategories: [categoryName] } });
   };
 
-  const categories = [
-    {
-      icon: Smartphone,
-      title: 'Smartphones',
-      description: 'Los últimos modelos de iPhone, Samsung y más',
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      icon: Laptop,
-      title: 'Laptops',
-      description: 'Computadoras portátiles para trabajo y gaming',
-      color: 'from-purple-500 to-pink-500'
-    },
-    {
-      icon: Headphones,
-      title: 'Audio',
-      description: 'Audífonos, bocinas y equipos de sonido',
-      color: 'from-green-500 to-teal-500'
-    },
-    {
-      icon: Camera,
-      title: 'Fotografía',
-      description: 'Cámaras digitales y accesorios',
-      color: 'from-red-500 to-orange-500'
-    },
-    {
-      icon: Watch,
-      title: 'Wearables',
-      description: 'Smartwatches y dispositivos inteligentes',
-      color: 'from-indigo-500 to-blue-500'
-    },
-    {
-      icon: Gamepad2,
-      title: 'Gaming',
-      description: 'Consolas, videojuegos y accesorios',
-      color: 'from-yellow-500 to-orange-500'
-    }
-  ];
+  // Mapeo de íconos por nombre de categoría
+  const iconMap: Record<string, any> = {
+    'Computadoras': Laptop,
+    'Electrónica': Package,
+    'Teléfonos': Smartphone,
+    'Tabletas': Package,
+    'Accesorios': Package,
+    'Audio': Headphones,
+    'Video': Camera,
+    'Redes': Package,
+    'Almacenamiento': Package
+  };
+
+  // Mapeo de colores por categoría
+  const colorMap: Record<string, string> = {
+    'Computadoras': 'from-purple-500 to-pink-500',
+    'Electrónica': 'from-blue-500 to-cyan-500',
+    'Teléfonos': 'from-green-500 to-teal-500',
+    'Tabletas': 'from-red-500 to-orange-500',
+    'Accesorios': 'from-indigo-500 to-blue-500',
+    'Audio': 'from-yellow-500 to-orange-500',
+    'Video': 'from-pink-500 to-purple-500',
+    'Redes': 'from-teal-500 to-green-500',
+    'Almacenamiento': 'from-orange-500 to-red-500'
+  };
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesData = await ProductAPI.getCategories();
+        // Tomar solo las primeras 6 categorías para mostrar
+        const formattedCategories = categoriesData.slice(0, 6).map(cat => ({
+          id: cat.id,
+          title: cat.nombre,
+          icon: iconMap[cat.nombre] || Package,
+          description: `Explora nuestra selección de ${cat.nombre.toLowerCase()}`,
+          color: colorMap[cat.nombre] || 'from-gray-500 to-gray-600'
+        }));
+        setCategories(formattedCategories);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   return (
     <section>

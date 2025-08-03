@@ -83,7 +83,10 @@ export const ProveedorCarrito = ({ children }: { children: ReactNode }) => {
     try {
       const { data: productos } = await supabase
         .from('productos')
-        .select('*');
+        .select(`
+          *,
+          categorias(nombre)
+        `);
 
       const { data: carritoItems } = await supabase
         .from('carrito_items')
@@ -102,7 +105,13 @@ export const ProveedorCarrito = ({ children }: { children: ReactNode }) => {
               precio_original: producto.precio_original,
               imagen_url: producto.imagen_url,
               calificacion: producto.calificacion || 0,
-              categoria_id: producto.categoria_id?.toString() || '',
+              categoria_id: producto.categoria_id,
+              categoria_nombre: producto.categorias?.nombre || 'Sin categoría',
+              descripcion: producto.descripcion,
+              en_stock: producto.en_stock,
+              cantidad_stock: producto.cantidad_stock,
+              fecha_creacion: producto.fecha_creacion,
+              fecha_actualizacion: producto.fecha_actualizacion,
               cantidad: item.cantidad
             } as ArticuloCarrito;
           }

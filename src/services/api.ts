@@ -1,25 +1,12 @@
 // API Service para obtener datos de productos
 import { Product } from '../components/ProductCard';
 import { sampleProducts } from '../data/products';
+import { supabase } from '@/integrations/supabase/client';
 
 // Por ahora usamos datos locales, pero esta estructura permite fácil migración a API externa
 export class ProductAPI {
    private static baseUrl = import.meta.env.VITE_API_URL || '';
 
-  // Obtener todos los productos
-  static async getProducts(): Promise<Product[]> {
-    try {
-      // TODO: Reemplazar con llamada real a API externa
-        const response = await fetch(`${this.baseUrl}/api/productos`);
-        return response.json();
-      
-      // Por ahora retornamos datos de muestra
-      //return Promise.resolve(sampleProducts);
-    } catch (error) {
-      console.error('Error al obtener productos:', error);
-      return sampleProducts; // Fallback a datos locales
-    }
-  }
 
   // Obtener producto por slug
   static async getProductBySlug(slug: string): Promise<Product | undefined> {
@@ -38,19 +25,52 @@ export class ProductAPI {
     }
   }
 
-  // Obtener categorías disponibles
-  static async getCategories(): Promise<string[]> {
+  // Obtener categorías disponibles desde Supabase
+  static async getCategories(): Promise<{id: number, nombre: string}[]> {
     try {
-      // TODO: Reemplazar con llamada real a API externa
-      // const response = await fetch(`${this.baseUrl}/api/categorias`);
-      // return response.json();
+      const { data, error } = await supabase
+        .from('categorias')
+        .select('id, nombre')
+        .order('nombre');
       
-      const products = await this.getProducts();
-      const categories = [...new Set(products.map(p => p.categoria_id))].filter(Boolean);
-      return categories;
+      if (error) {
+        console.error('Error al obtener categorías:', error);
+        return [];
+      }
+      
+      return data || [];
     } catch (error) {
       console.error('Error al obtener categorías:', error);
       return [];
+    }
+  }
+
+  // Obtener productos desde Supabase
+  static async getProducts(): Promise<Product[]> {
+    try {
+      const { data, error } = await supabase
+        .from('productos')
+        .select(`
+          *,
+          categorias(nombre)
+        `);
+      
+      if (error) {
+        console.error('Error al obtener productos:', error);
+        return sampleProducts; // Fallback a datos locales
+      }
+      
+      // Transformar datos para incluir nombre de categoría
+      const productos = data?.map(producto => ({
+        ...producto,
+        categoria_nombre: producto.categorias?.nombre || 'Sin categoría',
+        calificacion: producto.calificacion || 0
+      })) || [];
+      
+      return productos;
+    } catch (error) {
+      console.error('Error al obtener productos:', error);
+      return sampleProducts; // Fallback a datos locales
     }
   }
 
@@ -73,14 +93,14 @@ export class ProductAPI {
           const searchTerm = filters.search.toLowerCase();
           const matchesSearch = 
             product.nombre.toLowerCase().includes(searchTerm) ||
-            product.descripcion.toLowerCase().includes(searchTerm) ||
-            product.categoria_id.toLowerCase().includes(searchTerm);
+            (product.descripcion || '').toLowerCase().includes(searchTerm) ||
+            (product.categoria_nombre || '').toLowerCase().includes(searchTerm);
           if (!matchesSearch) return false;
         }
 
         // Filtro de categorías
         if (filters.categories && filters.categories.length > 0) {
-          if (!filters.categories.includes(product.categoria_id)) return false;
+          if (!filters.categories.includes(product.categoria_nombre || '')) return false;
         }
 
         // Filtro de rango de precio

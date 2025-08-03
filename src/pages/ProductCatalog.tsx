@@ -24,7 +24,7 @@ const ProductCatalog = () => {
   const { articulosCarrito, agregarAlCarrito, actualizarCantidad, eliminarArticulo, contadorArticulosCarrito } = usarCarrito();
   
   const [productos, setProductos] = useState<Product[]>([]);
-  const [categorias, setCategorias] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<{id: number, nombre: string}[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [terminoBusqueda, establecerTerminoBusqueda] = useState('');
@@ -79,10 +79,10 @@ const ProductCatalog = () => {
   const productosFiltrados = useMemo(() => {
     let filtrados = productos.filter(producto => {
       const coincideBusqueda = producto.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
-                           producto.descripcion.toLowerCase().includes(terminoBusqueda.toLowerCase());
+                           (producto.descripcion || '').toLowerCase().includes(terminoBusqueda.toLowerCase());
       
       const coincideCategoria = categoriasSeleccionadas.length === 0 || 
-                             categoriasSeleccionadas.includes(producto.categoria_id);
+                             categoriasSeleccionadas.includes(producto.categoria_nombre || '');
       
       const coincidePrecio = producto.precio >= rangoPrecio[0] && producto.precio <= rangoPrecio[1];
       
@@ -101,7 +101,7 @@ const ProductCatalog = () => {
         case 'precio-high':
           return b.precio - a.precio;
         case 'rating':
-          return b.calificacion - a.calificacion;
+          return (b.calificacion || 0) - (a.calificacion || 0);
         case 'name':
         default:
           return a.nombre.localeCompare(b.nombre);
@@ -136,13 +136,13 @@ const ProductCatalog = () => {
         <h3 className="font-semibold mb-3">Categorías</h3>
         <div className="space-y-2">
           {categorias.map(categoria => (
-            <div key={categoria} className="flex items-center space-x-2">
+            <div key={categoria.id} className="flex items-center space-x-2">
               <Checkbox
-                id={categoria}
-                checked={categoriasSeleccionadas.includes(categoria)}
-                onCheckedChange={(marcado) => manejarCambioCategoria(categoria, marcado === true)}
+                id={categoria.nombre}
+                checked={categoriasSeleccionadas.includes(categoria.nombre)}
+                onCheckedChange={(marcado) => manejarCambioCategoria(categoria.nombre, marcado === true)}
               />
-              <label htmlFor={categoria} className="text-sm">{categoria}</label>
+              <label htmlFor={categoria.nombre} className="text-sm">{categoria.nombre}</label>
             </div>
           ))}
         </div>

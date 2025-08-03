@@ -9,13 +9,14 @@ export interface Product {
   precio: number;
   precio_original?: number | null;
   imagen_url: string;
-  calificacion: number;
-  categoria_id?: string | null;
-  descripcion?: string;
-  en_stock: boolean;
-  cantidad_stock: number;
-  fecha_creacion: string;
-  fecha_actualizacion: string;
+  calificacion: number | null;
+  categoria_id?: number | null;
+  categoria_nombre?: string;
+  descripcion?: string | null;
+  en_stock: boolean | null;
+  cantidad_stock: number | null;
+  fecha_creacion: string | null;
+  fecha_actualizacion: string | null;
 }
 
 interface ProductCardProps {
@@ -64,7 +65,7 @@ const ProductCard = ({ product, onAddToCart, onProductClick }: ProductCardProps)
 </div>
       
       <div className="p-4">
-        <span className="text-sm text-blue-600 font-medium">{product.categoria_id}</span>
+        <span className="text-sm text-blue-600 font-medium">{product.categoria_nombre || 'Sin categoría'}</span>
         <h3 className="font-semibold text-lg mt-1 mb-2 line-clamp-2">{product.nombre}</h3>
         
         <div className="flex items-center mb-2">
@@ -72,13 +73,13 @@ const ProductCard = ({ product, onAddToCart, onProductClick }: ProductCardProps)
             <Star
               key={i}
               className={`h-4 w-4 ${
-                i < Math.floor(product.calificacion)
+                i < Math.floor(product.calificacion || 0)
                   ? 'text-yellow-400 fill-current'
                   : 'text-gray-300'
               }`}
             />
           ))}
-          <span className="text-sm text-gray-600 ml-2">({product.calificacion})</span>
+          <span className="text-sm text-gray-600 ml-2">({product.calificacion || 0})</span>
         </div>
 
         <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.descripcion}</p>
