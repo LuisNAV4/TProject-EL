@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Search, Menu, X, User, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthDropdown from './auth/AuthDropdown';
 import { useNavigate } from 'react-router-dom';
+import { ProductAPI } from '@/services/api';
 
 // Configuración del logo - igual que en CatalogHeader
 const CONFIGURACION_LOGO = {
@@ -18,20 +19,35 @@ interface HeaderProps {
 
 const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categories, setCategories] = useState<{id: number, nombre: string}[]>([]);
   const navigate = useNavigate();
 
-  const categories = [
-    'Smartphones',
-    'Laptops',
-    'Audio',
-    'Gaming',
-    'Fotografía',
-    'Wearables'
-  ];
+  // Fetch categories from database
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesData = await ProductAPI.getCategories();
+        // Only show first 6 categories
+        setCategories(categoriesData.slice(0, 6));
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+    
+    loadCategories();
+  }, []);
 
   const handleCategoryClick = (category: string) => {
     navigate('/products', { state: { selectedCategories: [category] } });
     setIsMenuOpen(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate('/products', { state: { searchTerm: searchTerm.trim() } });
+    }
   };
 
   // Renderizado del logo igual que en CatalogHeader
@@ -85,14 +101,16 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
 
           {/* Search bar - desktop */}
           <div className="hidden md:flex flex-1 max-w-xl mx-8">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <input
                 type="text"
                 placeholder="Buscar smartphones, laptops, accesorios..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 pl-10 border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-[var(--color-bg)] text-[var(--color-text)]"
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-[var(--color-muted)]" />
-            </div>
+            </form>
           </div>
 
           {/* Right section */}
@@ -156,12 +174,12 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
               </button>
             </li>
             {categories.map((category) => (
-              <li key={category}>
+              <li key={category.id}>
                 <button
-                  onClick={() => handleCategoryClick(category)}
+                  onClick={() => handleCategoryClick(category.nombre)}
                   className="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors duration-200 block py-2 md:py-0 select-none cursor-pointer"
                 >
-                  {category}
+                  {category.nombre}
                 </button>
               </li>
             ))}
@@ -170,14 +188,16 @@ const Header = ({ cartItemCount, onCartClick }: HeaderProps) => {
 
         {/* Mobile search */}
         <div className="md:hidden pb-4">
-          <div className="relative">
+          <form onSubmit={handleSearch} className="relative">
             <input
               type="text"
               placeholder="Buscar productos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 pl-10 border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-[var(--color-bg)] text-[var(--color-text)]"
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-[var(--color-muted)]" />
-          </div>
+          </form>
         </div>
       </div>
     </header>

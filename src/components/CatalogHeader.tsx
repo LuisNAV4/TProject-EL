@@ -67,17 +67,6 @@ const CatalogHeader = ({ contadorArticulosCarrito, alClicCarrito }: PropiedadesC
             </div>
           </div>
 
-          {/* Search bar - desktop */}
-          <div className="hidden md:flex flex-1 max-w-xl mx-8">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Buscar smartphones, laptops, accesorios..."
-                className="w-full px-4 py-2 pl-10 border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-[var(--color-bg)] text-[var(--color-text)]"
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-[var(--color-muted)]" />
-            </div>
-          </div>
 
           {/* Right section */}
           <div className="flex items-center space-x-4">
@@ -120,15 +109,6 @@ const CatalogHeader = ({ contadorArticulosCarrito, alClicCarrito }: PropiedadesC
               </button>
             </div>
 
-            {/* Mobile search */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Buscar productos..."
-                className="w-full px-4 py-2 pl-10 border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-[var(--color-bg)] text-[var(--color-text)]"
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-[var(--color-muted)]" />
-            </div>
           </div>
         )}
       </div>

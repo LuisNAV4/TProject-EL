@@ -60,7 +60,7 @@ const ProductCatalog = () => {
   // Handle route state (filters from navigation)
   useEffect(() => {
     if (location.state) {
-      const { selectedCategories, onSale } = location.state;
+      const { selectedCategories, onSale, searchTerm } = location.state;
       
       if (selectedCategories) {
         establecerCategoriasSeleccionadas(selectedCategories);
@@ -68,6 +68,10 @@ const ProductCatalog = () => {
       
       if (onSale) {
         setMostrarOferta(true);
+      }
+      
+      if (searchTerm) {
+        establecerTerminoBusqueda(searchTerm);
       }
       
       // Clear location state after processing
