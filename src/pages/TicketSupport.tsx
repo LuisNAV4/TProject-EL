@@ -13,6 +13,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import Header from '../components/Header';
 import { usarCarrito } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { WhatsAppFloat } from "@/components/ui/whatsapp";
 
 const ticketSchema = z.object({
@@ -26,9 +28,11 @@ const TicketSupport = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { toast } = useToast();
   const { contadorArticulosCarrito, establecerCarritoAbierto } = usarCarrito();
   const [imagenSeleccionada, establecerImagenSeleccionada] = useState<File | null>(null);
   const [previsualizacionImagen, establecerPrevisualizacionImagen] = useState<string>('');
+  const [enviando, setEnviando] = useState(false);
 
   const form = useForm<TicketFormData>({
     resolver: zodResolver(ticketSchema),
@@ -50,13 +54,80 @@ const TicketSupport = () => {
     }
   };
 
-  const onSubmit = (data: TicketFormData) => {
-    // Simular envío del ticket
-    alert('Ticket enviado correctamente. Te contactaremos pronto.');
-    
-    // Determinar a dónde regresar basado en el estado de location
-    const returnTo = location.state?.from || '/';
-    navigate(returnTo);
+  const onSubmit = async (data: TicketFormData) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Debes estar registrado para enviar un ticket",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setEnviando(true);
+
+    try {
+      // Crear el ticket en la base de datos
+      const { data: ticketData, error: ticketError } = await supabase
+        .from('tickets')
+        .insert({
+          titulo: 'Reporte de problema',
+          descripcion: data.mensaje,
+          usuario_id: parseInt(user.id) || 0, // Convertir UUID a bigint si es necesario
+          estado: 'abierto',
+          prioridad: 'media'
+        })
+        .select()
+        .single();
+
+      if (ticketError) throw ticketError;
+
+      // Si hay imagen, subirla al storage
+      if (imagenSeleccionada && ticketData) {
+        const fileName = `${user.id}/${ticketData.id}_${Date.now()}_${imagenSeleccionada.name}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('tickets')
+          .upload(fileName, imagenSeleccionada);
+
+        if (uploadError) throw uploadError;
+
+        // Crear registro en archivos_tickets
+        const { error: archivoError } = await supabase
+          .from('archivos_tickets')
+          .insert({
+            ticket_id: ticketData.id,
+            tipo_archivo: imagenSeleccionada.type,
+            url_archivo: fileName
+          });
+
+        if (archivoError) throw archivoError;
+      }
+
+      toast({
+        title: "Ticket enviado",
+        description: "Tu ticket ha sido enviado correctamente. Te contactaremos pronto.",
+      });
+
+      // Limpiar formulario
+      form.reset();
+      establecerImagenSeleccionada(null);
+      establecerPrevisualizacionImagen('');
+
+      // Determinar a dónde regresar basado en el estado de location
+      const returnTo = location.state?.from || '/';
+      navigate(returnTo);
+
+    } catch (error) {
+      console.error('Error al enviar ticket:', error);
+      toast({
+        title: "Error",
+        description: "Hubo un problema al enviar tu ticket. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -188,10 +259,11 @@ const TicketSupport = () => {
 
                 <Button
                   type="submit"
+                  disabled={enviando}
                   className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:brightness-110 flex items-center justify-center"
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  Enviar Ticket
+                  {enviando ? 'Enviando...' : 'Enviar Ticket'}
                 </Button>
               </form>
             </Form>
