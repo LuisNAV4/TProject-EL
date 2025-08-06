@@ -17,12 +17,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { WhatsAppFloat } from "@/components/ui/whatsapp";
 
-const ticketSchema = z.object({
-  email: z.string().email('Ingresa un email válido'),
+// Schema dinámico basado en si el usuario está autenticado
+const createTicketSchema = (isAuthenticated: boolean) => z.object({
+  email: isAuthenticated 
+    ? z.string().optional() 
+    : z.string().email('Ingresa un email válido'),
   mensaje: z.string().min(10, 'El mensaje debe tener al menos 10 caracteres'),
 });
 
-type TicketFormData = z.infer<typeof ticketSchema>;
+type TicketFormData = {
+  email?: string;
+  mensaje: string;
+};
 
 const TicketSupport = () => {
   const navigate = useNavigate();
@@ -35,7 +41,7 @@ const TicketSupport = () => {
   const [enviando, setEnviando] = useState(false);
 
   const form = useForm<TicketFormData>({
-    resolver: zodResolver(ticketSchema),
+    resolver: zodResolver(createTicketSchema(!!user)),
     defaultValues: {
       email: user?.email || '',
       mensaje: '',
@@ -55,10 +61,11 @@ const TicketSupport = () => {
   };
 
   const onSubmit = async (data: TicketFormData) => {
-    if (!user) {
+    // Validar que usuarios no registrados proporcionen email
+    if (!user && !data.email) {
       toast({
         title: "Error",
-        description: "Debes estar registrado para enviar un ticket",
+        description: "Debes proporcionar un email para enviar un ticket",
         variant: "destructive",
       });
       return;
@@ -68,23 +75,30 @@ const TicketSupport = () => {
 
     try {
       // Crear el ticket en la base de datos
-      const { data: ticketData, error: ticketError } = await supabase
-        .from('tickets')
-        .insert({
-          titulo: 'Reporte de problema',
-          descripcion: data.mensaje,
-          usuario_id: user.id, // Usar directamente el UUID del usuario
-          estado: 'abierto',
-          prioridad: 'media'
+      const ticketData = {
+        titulo: 'Reporte de problema',
+        descripcion: data.mensaje,
+        usuario_id: user?.id || null, // Permitir null para usuarios no registrados
+        estado: 'abierto' as const,
+        prioridad: 'media' as const,
+        // Guardar el email en la descripción si no hay usuario registrado
+        ...((!user && data.email) && {
+          descripcion: `Email de contacto: ${data.email}\n\n${data.mensaje}`
         })
+      };
+
+      const { data: insertedTicket, error: ticketError } = await supabase
+        .from('tickets')
+        .insert(ticketData)
         .select()
         .single();
 
       if (ticketError) throw ticketError;
 
       // Si hay imagen, subirla al storage
-      if (imagenSeleccionada && ticketData) {
-        const fileName = `${user.id}/${ticketData.id}_${Date.now()}_${imagenSeleccionada.name}`;
+      if (imagenSeleccionada && insertedTicket) {
+        const userPrefix = user?.id || 'guest';
+        const fileName = `${userPrefix}/${insertedTicket.id}_${Date.now()}_${imagenSeleccionada.name}`;
         
         const { error: uploadError } = await supabase.storage
           .from('tickets')
@@ -96,7 +110,7 @@ const TicketSupport = () => {
         const { error: archivoError } = await supabase
           .from('archivos_tickets')
           .insert({
-            ticket_id: ticketData.id,
+            ticket_id: insertedTicket.id,
             tipo_archivo: imagenSeleccionada.type,
             url_archivo: fileName
           });

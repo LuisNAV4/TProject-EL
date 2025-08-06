@@ -364,21 +364,21 @@ export type Database = {
           id: number
           mensaje: string
           ticket_id: number
-          usuario_id: string
+          usuario_id: string | null
         }
         Insert: {
           fecha?: string | null
           id?: number
           mensaje: string
           ticket_id: number
-          usuario_id: string
+          usuario_id?: string | null
         }
         Update: {
           fecha?: string | null
           id?: number
           mensaje?: string
           ticket_id?: number
-          usuario_id?: string
+          usuario_id?: string | null
         }
         Relationships: [
           {
@@ -753,7 +753,7 @@ export type Database = {
           id: number
           prioridad: Database["public"]["Enums"]["prioridad_ticket_enum"] | null
           titulo: string
-          usuario_id: string
+          usuario_id: string | null
         }
         Insert: {
           descripcion: string
@@ -766,7 +766,7 @@ export type Database = {
             | Database["public"]["Enums"]["prioridad_ticket_enum"]
             | null
           titulo: string
-          usuario_id: string
+          usuario_id?: string | null
         }
         Update: {
           descripcion?: string
@@ -779,7 +779,7 @@ export type Database = {
             | Database["public"]["Enums"]["prioridad_ticket_enum"]
             | null
           titulo?: string
-          usuario_id?: string
+          usuario_id?: string | null
         }
         Relationships: [
           {
