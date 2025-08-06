@@ -11,14 +11,48 @@ export class ProductAPI {
   // Obtener producto por slug
   static async getProductBySlug(slug: string): Promise<Product | undefined> {
     try {
-      // TODO: Reemplazar con llamada real a API externa
-      // const response = await fetch(`${this.baseUrl}/api/products/${slug}`);
-      // return response.json();
+      // Intentar buscar por ID numerico si el slug es un número
+      const numericId = parseInt(slug);
+      if (!isNaN(numericId)) {
+        const { data, error } = await supabase
+          .from('productos')
+          .select(`
+            *,
+            categorias(nombre)
+          `)
+          .eq('id', numericId)
+          .single();
+        
+        if (!error && data) {
+          return {
+            ...data,
+            categoria_nombre: data.categorias?.nombre || 'Sin categoría',
+            calificacion: data.calificacion || 0
+          };
+        }
+      }
       
-      const products = await this.getProducts();
-      return products.find(product => 
-        this.nombreToSlug(product.nombre) === slug
-      );
+      // Si no se encuentra por ID o el slug no es numérico, buscar por slug del nombre
+      const { data: allData, error: allError } = await supabase
+        .from('productos')
+        .select(`
+          *,
+          categorias(nombre)
+        `);
+      
+      if (allError || !allData) {
+        console.error('Error al obtener productos:', allError);
+        return undefined;
+      }
+      
+      const product = allData.find(p => this.nombreToSlug(p.nombre) === slug);
+      if (!product) return undefined;
+      
+      return {
+        ...product,
+        categoria_nombre: product.categorias?.nombre || 'Sin categoría',
+        calificacion: product.calificacion || 0
+      };
     } catch (error) {
       console.error('Error al obtener producto por slug:', error);
       return undefined;
