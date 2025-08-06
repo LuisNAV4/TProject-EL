@@ -364,21 +364,21 @@ export type Database = {
           id: number
           mensaje: string
           ticket_id: number
-          usuario_id: number
+          usuario_id: string
         }
         Insert: {
           fecha?: string | null
           id?: number
           mensaje: string
           ticket_id: number
-          usuario_id: number
+          usuario_id: string
         }
         Update: {
           fecha?: string | null
           id?: number
           mensaje?: string
           ticket_id?: number
-          usuario_id?: number
+          usuario_id?: string
         }
         Relationships: [
           {
@@ -392,7 +392,7 @@ export type Database = {
             foreignKeyName: "mensajes_tickets_usuario_id_fkey"
             columns: ["usuario_id"]
             isOneToOne: false
-            referencedRelation: "usuarios"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -753,7 +753,7 @@ export type Database = {
           id: number
           prioridad: Database["public"]["Enums"]["prioridad_ticket_enum"] | null
           titulo: string
-          usuario_id: number
+          usuario_id: string
         }
         Insert: {
           descripcion: string
@@ -766,7 +766,7 @@ export type Database = {
             | Database["public"]["Enums"]["prioridad_ticket_enum"]
             | null
           titulo: string
-          usuario_id: number
+          usuario_id: string
         }
         Update: {
           descripcion?: string
@@ -779,14 +779,14 @@ export type Database = {
             | Database["public"]["Enums"]["prioridad_ticket_enum"]
             | null
           titulo?: string
-          usuario_id?: number
+          usuario_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "tickets_usuario_id_fkey"
             columns: ["usuario_id"]
             isOneToOne: false
-            referencedRelation: "usuarios"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

@@ -73,7 +73,7 @@ const TicketSupport = () => {
         .insert({
           titulo: 'Reporte de problema',
           descripcion: data.mensaje,
-          usuario_id: parseInt(user.id) || 0, // Convertir UUID a bigint si es necesario
+          usuario_id: user.id, // Usar directamente el UUID del usuario
           estado: 'abierto',
           prioridad: 'media'
         })
