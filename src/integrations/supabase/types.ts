@@ -868,7 +868,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       estado_pago_enum: "pendiente" | "pagado" | "fallido" | "reembolsado"
