@@ -91,7 +91,7 @@ export const ProveedorCarrito = ({ children }: { children: ReactNode }) => {
       const { data: carritoItems } = await supabase
         .from('carrito_items')
         .select('*')
-        .eq('usuario_id', parseInt(usuarioId));
+        .eq('usuario_id', usuarioId);
 
       if (carritoItems && productos) {
         const articulosCarrito = carritoItems.map(item => {
@@ -136,7 +136,7 @@ export const ProveedorCarrito = ({ children }: { children: ReactNode }) => {
           await supabase
             .from('carrito_items')
             .upsert({
-              usuario_id: parseInt(usuarioId),
+              usuario_id: usuarioId,
               producto_id: articulo.id,
               cantidad: articulo.cantidad
             });
@@ -161,12 +161,12 @@ export const ProveedorCarrito = ({ children }: { children: ReactNode }) => {
         await supabase
           .from('carrito_items')
           .delete()
-          .eq('usuario_id', parseInt(usuario.id));
+          .eq('usuario_id', usuario.id);
 
         // Insertar nuevos artículos
         if (nuevosArticulos.length > 0) {
           const itemsParaInsertar = nuevosArticulos.map(articulo => ({
-            usuario_id: parseInt(usuario.id),
+            usuario_id: usuario.id,
             producto_id: articulo.id,
             cantidad: articulo.cantidad
           }));

@@ -52,21 +52,21 @@ export type Database = {
           fecha_agregado: string | null
           id: number
           producto_id: number
-          usuario_id: number
+          usuario_id: string
         }
         Insert: {
           cantidad?: number
           fecha_agregado?: string | null
           id?: number
           producto_id: number
-          usuario_id: number
+          usuario_id: string
         }
         Update: {
           cantidad?: number
           fecha_agregado?: string | null
           id?: number
           producto_id?: number
-          usuario_id?: number
+          usuario_id?: string
         }
         Relationships: [
           {
@@ -74,13 +74,6 @@ export type Database = {
             columns: ["producto_id"]
             isOneToOne: false
             referencedRelation: "productos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "carrito_items_usuario_id_fkey"
-            columns: ["usuario_id"]
-            isOneToOne: false
-            referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
         ]
@@ -469,7 +462,7 @@ export type Database = {
           numero_referencia_pago: string | null
           numero_seguimiento: string | null
           url_comprobante_pago: string | null
-          usuario_id: number
+          usuario_id: string
         }
         Insert: {
           direccion_envio: string
@@ -488,7 +481,7 @@ export type Database = {
           numero_referencia_pago?: string | null
           numero_seguimiento?: string | null
           url_comprobante_pago?: string | null
-          usuario_id: number
+          usuario_id: string
         }
         Update: {
           direccion_envio?: string
@@ -507,17 +500,9 @@ export type Database = {
           numero_referencia_pago?: string | null
           numero_seguimiento?: string | null
           url_comprobante_pago?: string | null
-          usuario_id?: number
+          usuario_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "pedidos_usuario_id_fkey"
-            columns: ["usuario_id"]
-            isOneToOne: false
-            referencedRelation: "usuarios"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       pedidos_descuentos: {
         Row: {

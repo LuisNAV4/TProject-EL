@@ -61,7 +61,7 @@ const Checkout = () => {
           .from('pedidos')
           .insert({
             numero_pedido: numeroPedido,
-            usuario_id: parseInt(user.id),
+            usuario_id: user.id,
             monto_total: totalEnDolares,
             metodo_pago: metodoSeleccionado === 'pago-movil' ? 'contra_entrega' : 'transferencia_bancaria',
             direccion_envio: 'Por definir',
