@@ -97,7 +97,7 @@ const PaymentConfirmation = () => {
       }
 
       // Check if the order belongs to the current user
-      if (pedido.usuario_id.toString() !== user.id) {
+      if (pedido.usuario_id !== user.id) {
         toast({
           title: "Error de autorización",
           description: "Esta orden no pertenece a tu cuenta",
@@ -133,7 +133,7 @@ const PaymentConfirmation = () => {
           estado_pago: 'pendiente'
         })
         .eq('id', orderData.orderId)
-        .eq('usuario_id', parseInt(user.id) as any); // Double security check
+        .eq('usuario_id', user.id);
 
       if (updateError) {
         throw updateError;
