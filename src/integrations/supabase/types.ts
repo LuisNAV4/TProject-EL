@@ -150,6 +150,27 @@ export type Database = {
         }
         Relationships: []
       }
+      configuracion: {
+        Row: {
+          created_at: string
+          id: string
+          tasa_del_dolar: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tasa_del_dolar?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tasa_del_dolar?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       descuentos: {
         Row: {
           activo: boolean | null
@@ -868,6 +889,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean

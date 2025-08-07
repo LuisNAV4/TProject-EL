@@ -156,17 +156,33 @@ const ProductCatalog = () => {
       <div>
         <h3 className="font-semibold mb-3">Rango de Precio</h3>
         <div className="space-y-4">
-          <Slider
-            value={rangoPrecio}
-            onValueChange={establecerRangoPrecio}
-            max={50000}
-            min={0}
-            step={1000}
-            className="w-full"
-          />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>REF: {rangoPrecio[0].toLocaleString()}</span>
-            <span>REF: {rangoPrecio[1].toLocaleString()}</span>
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <label className="text-sm text-gray-600">Mínimo</label>
+              <Input
+                type="number"
+                placeholder="0"
+                value={rangoPrecio[0] || ''}
+                onChange={(e) => {
+                  const valor = e.target.value === '' ? 0 : parseInt(e.target.value);
+                  establecerRangoPrecio([valor, rangoPrecio[1]]);
+                }}
+                className="mt-1"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm text-gray-600">Máximo</label>
+              <Input
+                type="number"
+                placeholder="50000"
+                value={rangoPrecio[1] || ''}
+                onChange={(e) => {
+                  const valor = e.target.value === '' ? 50000 : parseInt(e.target.value);
+                  establecerRangoPrecio([rangoPrecio[0], valor]);
+                }}
+                className="mt-1"
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -12,35 +12,37 @@ import { supabase } from '@/integrations/supabase/client';
 const Checkout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { articulosCarrito, contadorArticulosCarrito, establecerCarritoAbierto } = usarCarrito();
+  const { articulosCarrito, contadorArticulosCarrito, establecerCarritoAbierto, limpiarCarrito } = usarCarrito();
   const [metodoSeleccionado, establecerMetodoSeleccionado] = useState('');
   const [datosPagoMovil, setDatosPagoMovil] = useState<any[]>([]);
   const [datosTransferencia, setDatosTransferencia] = useState<any[]>([]);
+  const [tasaDolar, setTasaDolar] = useState<number>(100);
 
   const total = articulosCarrito.reduce((suma, articulo) => suma + (articulo.precio * articulo.cantidad), 0);
+  const totalEnDolares = total * tasaDolar;
 
-  // Cargar datos de pago desde la base de datos
+  // Cargar datos de pago y tasa del dólar desde la base de datos
   useEffect(() => {
-    const cargarDatosPago = async () => {
+    const cargarDatos = async () => {
       try {
-        const { data: pagoMovil } = await supabase
-          .from('pago_movil_data')
-          .select('*')
-          .eq('activo', true);
+        const [pagoMovilRes, transferenciaRes, configuracionRes] = await Promise.all([
+          supabase.from('pago_movil_data').select('*').eq('activo', true),
+          supabase.from('transferencia_data').select('*').eq('activo', true),
+          supabase.from('configuracion').select('tasa_del_dolar').limit(1).single()
+        ]);
           
-        const { data: transferencia } = await supabase
-          .from('transferencia_data')
-          .select('*')
-          .eq('activo', true);
-          
-        setDatosPagoMovil(pagoMovil || []);
-        setDatosTransferencia(transferencia || []);
+        setDatosPagoMovil(pagoMovilRes.data || []);
+        setDatosTransferencia(transferenciaRes.data || []);
+        
+        if (configuracionRes.data) {
+          setTasaDolar(configuracionRes.data.tasa_del_dolar);
+        }
       } catch (error) {
-        console.error('Error cargando datos de pago:', error);
+        console.error('Error cargando datos:', error);
       }
     };
 
-    cargarDatosPago();
+    cargarDatos();
   }, []);
 
   const manejarProcesarPago = async () => {
@@ -59,8 +61,8 @@ const Checkout = () => {
           .from('pedidos')
           .insert({
             numero_pedido: numeroPedido,
-            usuario_id: parseInt(user.id) as any, // Temporal fix para tipo
-            monto_total: total,
+            usuario_id: parseInt(user.id),
+            monto_total: totalEnDolares,
             metodo_pago: metodoSeleccionado === 'pago-movil' ? 'contra_entrega' : 'transferencia_bancaria',
             direccion_envio: 'Por definir',
             direccion_facturacion: 'Por definir',
@@ -104,6 +106,9 @@ const Checkout = () => {
             ]
           });
 
+        // Limpiar carrito después de crear el pedido
+        await limpiarCarrito();
+        
         // Redirigir a la página de confirmación de pago
         navigate('/payment-confirmation', {
           state: { 
@@ -204,10 +209,17 @@ const Checkout = () => {
                   </div>
                 ))}
                 
-                <div className="border-t pt-4">
-                  <div className="flex justify-between text-xl font-bold">
-                    <span>Total:</span>
+                <div className="border-t pt-4 space-y-2">
+                  <div className="flex justify-between text-lg">
+                    <span>Subtotal:</span>
                     <span>REF {total.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-xl font-bold">
+                    <span>Total (USD):</span>
+                    <span>${totalEnDolares.toLocaleString()}</span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Tasa utilizada: {tasaDolar.toLocaleString()} Bs/$
                   </div>
                 </div>
               </div>
